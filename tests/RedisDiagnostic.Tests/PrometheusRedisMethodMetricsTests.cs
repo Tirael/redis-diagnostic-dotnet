@@ -1,6 +1,3 @@
-using Microsoft.Extensions.Time.Testing;
-using Prometheus;
-
 namespace RedisDiagnostic.Tests;
 
 public sealed class PrometheusRedisMethodMetricsTests
@@ -8,9 +5,9 @@ public sealed class PrometheusRedisMethodMetricsTests
     [Fact]
     public void Measure_WhenActionSucceeds_RecordsOkDuration()
     {
-        var timeProvider = new FakeTimeProvider();
+        FakeTimeProvider timeProvider = new();
         var registry = Metrics.NewCustomRegistry();
-        var sut = new PrometheusRedisMethodMetrics(registry, timeProvider);
+        PrometheusRedisMethodMetrics sut = new(registry, timeProvider);
 
         var result = sut.Measure("StringGet", () =>
         {
@@ -18,34 +15,34 @@ public sealed class PrometheusRedisMethodMetricsTests
             return 42;
         });
 
-        Assert.Equal(42, result);
+        result.ShouldBe(42);
         AssertObservation(registry, "StringGet", PrometheusRedisMethodMetrics.ResultOk, TimeSpan.FromMilliseconds(25));
     }
 
     [Fact]
     public void Measure_WhenActionThrows_RecordsErrorAndRethrows()
     {
-        var timeProvider = new FakeTimeProvider();
+        FakeTimeProvider timeProvider = new();
         var registry = Metrics.NewCustomRegistry();
-        var sut = new PrometheusRedisMethodMetrics(registry, timeProvider);
+        PrometheusRedisMethodMetrics sut = new(registry, timeProvider);
 
-        var thrown = Assert.Throws<InvalidOperationException>(() =>
+        var thrown = Should.Throw<InvalidOperationException>(() =>
             sut.Measure("StringSet", () =>
             {
                 timeProvider.Advance(TimeSpan.FromMilliseconds(10));
                 throw new InvalidOperationException("boom");
             }));
 
-        Assert.Equal("boom", thrown.Message);
+        thrown.Message.ShouldBe("boom");
         AssertObservation(registry, "StringSet", PrometheusRedisMethodMetrics.ResultError, TimeSpan.FromMilliseconds(10));
     }
 
     [Fact]
     public void Measure_WhenActionIsVoidAndSucceeds_RecordsOk()
     {
-        var timeProvider = new FakeTimeProvider();
+        FakeTimeProvider timeProvider = new();
         var registry = Metrics.NewCustomRegistry();
-        var sut = new PrometheusRedisMethodMetrics(registry, timeProvider);
+        PrometheusRedisMethodMetrics sut = new(registry, timeProvider);
         var invoked = false;
 
         sut.Measure("KeyRestore", () =>
@@ -54,16 +51,16 @@ public sealed class PrometheusRedisMethodMetricsTests
             invoked = true;
         });
 
-        Assert.True(invoked);
+        invoked.ShouldBeTrue();
         AssertObservation(registry, "KeyRestore", PrometheusRedisMethodMetrics.ResultOk, TimeSpan.FromMilliseconds(5));
     }
 
     [Fact]
     public async Task MeasureAsync_WhenTaskSucceeds_RecordsOkDuration()
     {
-        var timeProvider = new FakeTimeProvider();
+        FakeTimeProvider timeProvider = new();
         var registry = Metrics.NewCustomRegistry();
-        var sut = new PrometheusRedisMethodMetrics(registry, timeProvider);
+        PrometheusRedisMethodMetrics sut = new(registry, timeProvider);
 
         var result = await sut.MeasureAsync("StringGetAsync", async () =>
         {
@@ -72,18 +69,18 @@ public sealed class PrometheusRedisMethodMetricsTests
             return "value";
         });
 
-        Assert.Equal("value", result);
+        result.ShouldBe("value");
         AssertObservation(registry, "StringGetAsync", PrometheusRedisMethodMetrics.ResultOk, TimeSpan.FromMilliseconds(40));
     }
 
     [Fact]
     public async Task MeasureAsync_WhenTaskThrows_RecordsErrorAndRethrows()
     {
-        var timeProvider = new FakeTimeProvider();
+        FakeTimeProvider timeProvider = new();
         var registry = Metrics.NewCustomRegistry();
-        var sut = new PrometheusRedisMethodMetrics(registry, timeProvider);
+        PrometheusRedisMethodMetrics sut = new(registry, timeProvider);
 
-        var thrown = await Assert.ThrowsAsync<InvalidOperationException>(() =>
+        var thrown = await Should.ThrowAsync<InvalidOperationException>(() =>
             sut.MeasureAsync("PingAsync", async () =>
             {
                 timeProvider.Advance(TimeSpan.FromMilliseconds(15));
@@ -91,16 +88,16 @@ public sealed class PrometheusRedisMethodMetricsTests
                 throw new InvalidOperationException("async-boom");
             }));
 
-        Assert.Equal("async-boom", thrown.Message);
+        thrown.Message.ShouldBe("async-boom");
         AssertObservation(registry, "PingAsync", PrometheusRedisMethodMetrics.ResultError, TimeSpan.FromMilliseconds(15));
     }
 
     [Fact]
     public async Task MeasureAsync_WhenTaskIsNonGenericAndSucceeds_RecordsOk()
     {
-        var timeProvider = new FakeTimeProvider();
+        FakeTimeProvider timeProvider = new();
         var registry = Metrics.NewCustomRegistry();
-        var sut = new PrometheusRedisMethodMetrics(registry, timeProvider);
+        PrometheusRedisMethodMetrics sut = new(registry, timeProvider);
 
         await sut.MeasureAsync("WaitAsync", async () =>
         {
@@ -117,18 +114,19 @@ public sealed class PrometheusRedisMethodMetricsTests
         string result,
         TimeSpan expectedDuration)
     {
+        HistogramConfiguration configuration = new()
+        {
+            LabelNames = [PrometheusRedisMethodMetrics.LabelMethod, PrometheusRedisMethodMetrics.LabelResult],
+        };
         var histogram = Metrics
             .WithCustomRegistry(registry)
             .CreateHistogram(
                 PrometheusRedisMethodMetrics.MetricName,
                 PrometheusRedisMethodMetrics.MetricHelp,
-                new HistogramConfiguration
-                {
-                    LabelNames = [PrometheusRedisMethodMetrics.LabelMethod, PrometheusRedisMethodMetrics.LabelResult],
-                });
+                configuration);
 
         var child = histogram.WithLabels(methodName, result);
-        Assert.Equal(1, child.Count);
-        Assert.Equal(expectedDuration.TotalSeconds, child.Sum, precision: 9);
+        child.Count.ShouldBe(1);
+        child.Sum.Should().BeApproximately(expectedDuration.TotalSeconds, 1e-9);
     }
 }

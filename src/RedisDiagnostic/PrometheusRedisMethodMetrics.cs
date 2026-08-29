@@ -1,5 +1,3 @@
-using Prometheus;
-
 namespace RedisDiagnostic;
 
 /// <summary>
@@ -39,15 +37,13 @@ public sealed class PrometheusRedisMethodMetrics : IRedisMethodMetrics
         ArgumentNullException.ThrowIfNull(timeProvider);
 
         _timeProvider = timeProvider;
+        HistogramConfiguration configuration = new()
+        {
+            LabelNames = [LabelMethod, LabelResult],
+        };
         _duration = Metrics
             .WithCustomRegistry(registry)
-            .CreateHistogram(
-                MetricName,
-                MetricHelp,
-                new HistogramConfiguration
-                {
-                    LabelNames = [LabelMethod, LabelResult],
-                });
+            .CreateHistogram(MetricName, MetricHelp, configuration);
     }
 
     /// <inheritdoc />

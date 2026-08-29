@@ -1,6 +1,3 @@
-using RedisDiagnostic.FunctionalTests.Infrastructure;
-using StackExchange.Redis;
-
 namespace RedisDiagnostic.FunctionalTests.Methods;
 
 [Collection(RedisCollection.Name)]
@@ -16,12 +13,12 @@ public sealed class StringTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         var written = session.Database.StringSet(key, "v");
-        Assert.True(written);
-        Assert.Equal("v", (string?)session.Raw.StringGet(key));
+        written.ShouldBeTrue();
+        ((string?)session.Raw.StringGet(key)).ShouldBe("v");
         session.AssertObserved(nameof(IDatabase.StringSet));
     }
 
@@ -31,12 +28,12 @@ public sealed class StringTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         var written = await session.Database.StringSetAsync(key, "v");
-        Assert.True(written);
-        Assert.Equal("v", (string?)session.Raw.StringGet(key));
+        written.ShouldBeTrue();
+        ((string?)session.Raw.StringGet(key)).ShouldBe("v");
         session.AssertObserved(nameof(IDatabase.StringSetAsync));
     }
 
@@ -46,12 +43,12 @@ public sealed class StringTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.StringSet(key, "v");
         var value = session.Database.StringGet(key);
-        Assert.Equal("v", (string?)value);
+        ((string?)value).ShouldBe("v");
         session.AssertObserved(nameof(IDatabase.StringGet));
     }
 
@@ -61,12 +58,12 @@ public sealed class StringTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.StringSet(key, "v");
         var value = await session.Database.StringGetAsync(key);
-        Assert.Equal("v", (string?)value);
+        ((string?)value).ShouldBe("v");
         session.AssertObserved(nameof(IDatabase.StringGetAsync));
     }
 
@@ -76,13 +73,13 @@ public sealed class StringTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.StringSet(key, "v");
         var value = session.Database.StringGetDelete(key);
-        Assert.Equal("v", (string?)value);
-        Assert.False(session.Raw.KeyExists(key));
+        ((string?)value).ShouldBe("v");
+        session.Raw.KeyExists(key).ShouldBeFalse();
         session.AssertObserved(nameof(IDatabase.StringGetDelete));
     }
 
@@ -92,13 +89,13 @@ public sealed class StringTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.StringSet(key, "v");
         var value = await session.Database.StringGetDeleteAsync(key);
-        Assert.Equal("v", (string?)value);
-        Assert.False(session.Raw.KeyExists(key));
+        ((string?)value).ShouldBe("v");
+        session.Raw.KeyExists(key).ShouldBeFalse();
         session.AssertObserved(nameof(IDatabase.StringGetDeleteAsync));
     }
 
@@ -108,13 +105,13 @@ public sealed class StringTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.StringSet(key, "old");
         var previous = session.Database.StringGetSet(key, "new");
-        Assert.Equal("old", (string?)previous);
-        Assert.Equal("new", (string?)session.Raw.StringGet(key));
+        ((string?)previous).ShouldBe("old");
+        ((string?)session.Raw.StringGet(key)).ShouldBe("new");
         session.AssertObserved(nameof(IDatabase.StringGetSet));
     }
 
@@ -124,13 +121,13 @@ public sealed class StringTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.StringSet(key, "old");
         var previous = await session.Database.StringGetSetAsync(key, "new");
-        Assert.Equal("old", (string?)previous);
-        Assert.Equal("new", (string?)session.Raw.StringGet(key));
+        ((string?)previous).ShouldBe("old");
+        ((string?)session.Raw.StringGet(key)).ShouldBe("new");
         session.AssertObserved(nameof(IDatabase.StringGetSetAsync));
     }
 
@@ -140,13 +137,13 @@ public sealed class StringTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.StringSet(key, "v");
         var previous = session.Database.StringGetSetExpiry(key, TimeSpan.FromMinutes(1));
-        Assert.Equal("v", (string?)previous);
-        Assert.NotNull(session.Raw.KeyTimeToLive(key));
+        ((string?)previous).ShouldBe("v");
+        session.Raw.KeyTimeToLive(key).ShouldNotBeNull();
         session.AssertObserved(nameof(IDatabase.StringGetSetExpiry));
     }
 
@@ -156,13 +153,13 @@ public sealed class StringTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.StringSet(key, "v");
         var previous = await session.Database.StringGetSetExpiryAsync(key, TimeSpan.FromMinutes(1));
-        Assert.Equal("v", (string?)previous);
-        Assert.NotNull(session.Raw.KeyTimeToLive(key));
+        ((string?)previous).ShouldBe("v");
+        session.Raw.KeyTimeToLive(key).ShouldNotBeNull();
         session.AssertObserved(nameof(IDatabase.StringGetSetExpiryAsync));
     }
 
@@ -172,13 +169,13 @@ public sealed class StringTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.StringSet(key, "v", TimeSpan.FromMinutes(1));
         var value = session.Database.StringGetWithExpiry(key);
-        Assert.Equal("v", (string?)value.Value);
-        Assert.NotNull(value.Expiry);
+        ((string?)value.Value).ShouldBe("v");
+        value.Expiry.ShouldNotBeNull();
         session.AssertObserved(nameof(IDatabase.StringGetWithExpiry));
     }
 
@@ -188,13 +185,13 @@ public sealed class StringTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.StringSet(key, "v", TimeSpan.FromMinutes(1));
         var value = await session.Database.StringGetWithExpiryAsync(key);
-        Assert.Equal("v", (string?)value.Value);
-        Assert.NotNull(value.Expiry);
+        ((string?)value.Value).ShouldBe("v");
+        value.Expiry.ShouldNotBeNull();
         session.AssertObserved(nameof(IDatabase.StringGetWithExpiryAsync));
     }
 
@@ -204,13 +201,13 @@ public sealed class StringTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.StringSet(key, "a");
         var length = session.Database.StringAppend(key, "b");
-        Assert.Equal(2, length);
-        Assert.Equal("ab", (string?)session.Raw.StringGet(key));
+        length.ShouldBe(2);
+        ((string?)session.Raw.StringGet(key)).ShouldBe("ab");
         session.AssertObserved(nameof(IDatabase.StringAppend));
     }
 
@@ -220,13 +217,13 @@ public sealed class StringTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.StringSet(key, "a");
         var length = await session.Database.StringAppendAsync(key, "b");
-        Assert.Equal(2, length);
-        Assert.Equal("ab", (string?)session.Raw.StringGet(key));
+        length.ShouldBe(2);
+        ((string?)session.Raw.StringGet(key)).ShouldBe("ab");
         session.AssertObserved(nameof(IDatabase.StringAppendAsync));
     }
 
@@ -236,12 +233,12 @@ public sealed class StringTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.StringSet(key, "abc");
         var length = session.Database.StringLength(key);
-        Assert.Equal(3, length);
+        length.ShouldBe(3);
         session.AssertObserved(nameof(IDatabase.StringLength));
     }
 
@@ -251,12 +248,12 @@ public sealed class StringTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.StringSet(key, "abc");
         var length = await session.Database.StringLengthAsync(key);
-        Assert.Equal(3, length);
+        length.ShouldBe(3);
         session.AssertObserved(nameof(IDatabase.StringLengthAsync));
     }
 
@@ -266,11 +263,11 @@ public sealed class StringTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         var value = session.Database.StringIncrement(key);
-        Assert.Equal(1, value);
+        value.ShouldBe(1);
         session.AssertObserved(nameof(IDatabase.StringIncrement));
     }
 
@@ -280,11 +277,11 @@ public sealed class StringTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         var value = await session.Database.StringIncrementAsync(key);
-        Assert.Equal(1, value);
+        value.ShouldBe(1);
         session.AssertObserved(nameof(IDatabase.StringIncrementAsync));
     }
 
@@ -294,12 +291,12 @@ public sealed class StringTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.StringSet(key, "5");
         var value = session.Database.StringDecrement(key);
-        Assert.Equal(4, value);
+        value.ShouldBe(4);
         session.AssertObserved(nameof(IDatabase.StringDecrement));
     }
 
@@ -309,12 +306,12 @@ public sealed class StringTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.StringSet(key, "5");
         var value = await session.Database.StringDecrementAsync(key);
-        Assert.Equal(4, value);
+        value.ShouldBe(4);
         session.AssertObserved(nameof(IDatabase.StringDecrementAsync));
     }
 
@@ -324,12 +321,12 @@ public sealed class StringTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.StringSet(key, "abcd");
         var value = session.Database.StringGetRange(key, 1, 2);
-        Assert.Equal("bc", (string?)value);
+        ((string?)value).ShouldBe("bc");
         session.AssertObserved(nameof(IDatabase.StringGetRange));
     }
 
@@ -339,12 +336,12 @@ public sealed class StringTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.StringSet(key, "abcd");
         var value = await session.Database.StringGetRangeAsync(key, 1, 2);
-        Assert.Equal("bc", (string?)value);
+        ((string?)value).ShouldBe("bc");
         session.AssertObserved(nameof(IDatabase.StringGetRangeAsync));
     }
 
@@ -354,12 +351,12 @@ public sealed class StringTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.StringSet(key, "abcd");
-        var value = session.Database.StringSetRange(key, 1, "XY");
-        Assert.Equal("aXYd", (string?)session.Raw.StringGet(key));
+        _ = session.Database.StringSetRange(key, 1, "XY");
+        ((string?)session.Raw.StringGet(key)).ShouldBe("aXYd");
         session.AssertObserved(nameof(IDatabase.StringSetRange));
     }
 
@@ -369,12 +366,12 @@ public sealed class StringTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.StringSet(key, "abcd");
         await session.Database.StringSetRangeAsync(key, 1, "XY");
-        Assert.Equal("aXYd", (string?)session.Raw.StringGet(key));
+        ((string?)session.Raw.StringGet(key)).ShouldBe("aXYd");
         session.AssertObserved(nameof(IDatabase.StringSetRangeAsync));
     }
 
@@ -384,12 +381,12 @@ public sealed class StringTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         var previous = session.Database.StringSetBit(key, 0, true);
-        Assert.False(previous);
-        Assert.True(session.Raw.StringGetBit(key, 0));
+        previous.ShouldBeFalse();
+        session.Raw.StringGetBit(key, 0).ShouldBeTrue();
         session.AssertObserved(nameof(IDatabase.StringSetBit));
     }
 
@@ -399,12 +396,12 @@ public sealed class StringTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         var previous = await session.Database.StringSetBitAsync(key, 0, true);
-        Assert.False(previous);
-        Assert.True(session.Raw.StringGetBit(key, 0));
+        previous.ShouldBeFalse();
+        session.Raw.StringGetBit(key, 0).ShouldBeTrue();
         session.AssertObserved(nameof(IDatabase.StringSetBitAsync));
     }
 
@@ -414,12 +411,12 @@ public sealed class StringTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.StringSetBit(key, 0, true);
         var bit = session.Database.StringGetBit(key, 0);
-        Assert.True(bit);
+        bit.ShouldBeTrue();
         session.AssertObserved(nameof(IDatabase.StringGetBit));
     }
 
@@ -429,12 +426,12 @@ public sealed class StringTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.StringSetBit(key, 0, true);
         var bit = await session.Database.StringGetBitAsync(key, 0);
-        Assert.True(bit);
+        bit.ShouldBeTrue();
         session.AssertObserved(nameof(IDatabase.StringGetBitAsync));
     }
 
@@ -444,12 +441,12 @@ public sealed class StringTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.StringSetBit(key, 0, true);
         var count = session.Database.StringBitCount(key);
-        Assert.Equal(1, count);
+        count.ShouldBe(1);
         session.AssertObserved(nameof(IDatabase.StringBitCount));
     }
 
@@ -459,12 +456,12 @@ public sealed class StringTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.StringSetBit(key, 0, true);
         var count = await session.Database.StringBitCountAsync(key);
-        Assert.Equal(1, count);
+        count.ShouldBe(1);
         session.AssertObserved(nameof(IDatabase.StringBitCountAsync));
     }
 
@@ -474,12 +471,12 @@ public sealed class StringTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.StringSetBit(key, 2, true);
         var position = session.Database.StringBitPosition(key, true);
-        Assert.Equal(2, position);
+        position.ShouldBe(2);
         session.AssertObserved(nameof(IDatabase.StringBitPosition));
     }
 
@@ -489,12 +486,12 @@ public sealed class StringTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.StringSetBit(key, 2, true);
         var position = await session.Database.StringBitPositionAsync(key, true);
-        Assert.Equal(2, position);
+        position.ShouldBe(2);
         session.AssertObserved(nameof(IDatabase.StringBitPositionAsync));
     }
 
@@ -504,16 +501,16 @@ public sealed class StringTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
-        var left = Fixture.NewKey("bl");
-        var right = Fixture.NewKey("br");
+        var left = NewKey("bl");
+        var right = NewKey("br");
         session.Raw.StringSetBit(left, 0, true);
         session.Raw.StringSetBit(right, 0, true);
         var length = session.Database.StringBitOperation(Bitwise.And, key, left, right);
-        Assert.True(length >= 1);
-        Assert.True(session.Raw.StringGetBit(key, 0));
+        length.ShouldBeGreaterThanOrEqualTo(1);
+        session.Raw.StringGetBit(key, 0).ShouldBeTrue();
         session.AssertObserved(nameof(IDatabase.StringBitOperation));
     }
 
@@ -523,16 +520,16 @@ public sealed class StringTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
-        var left = Fixture.NewKey("bl");
-        var right = Fixture.NewKey("br");
+        var left = NewKey("bl");
+        var right = NewKey("br");
         session.Raw.StringSetBit(left, 0, true);
         session.Raw.StringSetBit(right, 0, true);
         var length = await session.Database.StringBitOperationAsync(Bitwise.And, key, left, right);
-        Assert.True(length >= 1);
-        Assert.True(session.Raw.StringGetBit(key, 0));
+        length.ShouldBeGreaterThanOrEqualTo(1);
+        session.Raw.StringGetBit(key, 0).ShouldBeTrue();
         session.AssertObserved(nameof(IDatabase.StringBitOperationAsync));
     }
 
@@ -542,12 +539,12 @@ public sealed class StringTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.StringSet(key, "v");
         using var lease = session.Database.StringGetLease(key);
-        Assert.NotNull(lease);
+        lease.ShouldNotBeNull();
         session.AssertObserved(nameof(IDatabase.StringGetLease));
     }
 
@@ -557,12 +554,12 @@ public sealed class StringTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.StringSet(key, "v");
         using var lease = await session.Database.StringGetLeaseAsync(key);
-        Assert.NotNull(lease);
+        lease.ShouldNotBeNull();
         session.AssertObserved(nameof(IDatabase.StringGetLeaseAsync));
     }
 
@@ -572,12 +569,12 @@ public sealed class StringTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         var previous = session.Database.StringSetAndGet(key, "v");
-        Assert.True(previous.IsNull);
-        Assert.Equal("v", (string?)session.Raw.StringGet(key));
+        previous.IsNull.ShouldBeTrue();
+        ((string?)session.Raw.StringGet(key)).ShouldBe("v");
         session.AssertObserved(nameof(IDatabase.StringSetAndGet));
     }
 
@@ -587,13 +584,33 @@ public sealed class StringTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         var previous = await session.Database.StringSetAndGetAsync(key, "v");
-        Assert.True(previous.IsNull);
-        Assert.Equal("v", (string?)session.Raw.StringGet(key));
+        previous.IsNull.ShouldBeTrue();
+        ((string?)session.Raw.StringGet(key)).ShouldBe("v");
         session.AssertObserved(nameof(IDatabase.StringSetAndGetAsync));
+    }
+
+    [Fact]
+    [RedisMethod(nameof(IDatabase.StringDelete))]
+    public void Given_redis_When_StringDelete_Then_state_and_metric_are_observed()
+    {
+        var session = Fixture.CreateSession();
+        var key = NewKey();
+        session.Raw.StringSet(key, "v");
+        session.InvokeAndObserve(nameof(IDatabase.StringDelete), () => session.Database.StringDelete(key, ValueCondition.Exists));
+    }
+
+    [Fact]
+    [RedisMethod(nameof(IDatabase.StringDigest))]
+    public void Given_redis_When_StringDigest_Then_state_and_metric_are_observed()
+    {
+        var session = Fixture.CreateSession();
+        var key = NewKey();
+        session.Raw.StringSet(key, "v");
+        session.InvokeAndObserve(nameof(IDatabase.StringDigest), () => session.Database.StringDigest(key));
     }
 
     [Fact]
@@ -602,14 +619,14 @@ public sealed class StringTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
-        var other = Fixture.NewKey("s2");
+        var other = NewKey("s2");
         session.Raw.StringSet(key, "abcde");
         session.Raw.StringSet(other, "ace");
         var lcs = session.Database.StringLongestCommonSubsequence(key, other);
-        Assert.Equal("ace", lcs);
+        lcs.ShouldBe("ace");
         session.AssertObserved(nameof(IDatabase.StringLongestCommonSubsequence));
     }
 
@@ -619,14 +636,14 @@ public sealed class StringTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
-        var other = Fixture.NewKey("s2");
+        var other = NewKey("s2");
         session.Raw.StringSet(key, "abcde");
         session.Raw.StringSet(other, "ace");
         var lcs = await session.Database.StringLongestCommonSubsequenceAsync(key, other);
-        Assert.Equal("ace", lcs);
+        lcs.ShouldBe("ace");
         session.AssertObserved(nameof(IDatabase.StringLongestCommonSubsequenceAsync));
     }
 
@@ -636,14 +653,14 @@ public sealed class StringTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
-        var other = Fixture.NewKey("s2");
+        var other = NewKey("s2");
         session.Raw.StringSet(key, "abcde");
         session.Raw.StringSet(other, "ace");
         var length = session.Database.StringLongestCommonSubsequenceLength(key, other);
-        Assert.Equal(3, length);
+        length.ShouldBe(3);
         session.AssertObserved(nameof(IDatabase.StringLongestCommonSubsequenceLength));
     }
 
@@ -653,14 +670,14 @@ public sealed class StringTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
-        var other = Fixture.NewKey("s2");
+        var other = NewKey("s2");
         session.Raw.StringSet(key, "abcde");
         session.Raw.StringSet(other, "ace");
         var length = await session.Database.StringLongestCommonSubsequenceLengthAsync(key, other);
-        Assert.Equal(3, length);
+        length.ShouldBe(3);
         session.AssertObserved(nameof(IDatabase.StringLongestCommonSubsequenceLengthAsync));
     }
 
@@ -670,14 +687,14 @@ public sealed class StringTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
-        var other = Fixture.NewKey("s2");
+        var other = NewKey("s2");
         session.Raw.StringSet(key, "abcde");
         session.Raw.StringSet(other, "ace");
         var matches = session.Database.StringLongestCommonSubsequenceWithMatches(key, other);
-        Assert.True(matches.LongestMatchLength >= 1);
+        matches.LongestMatchLength.ShouldBeGreaterThanOrEqualTo(1);
         session.AssertObserved(nameof(IDatabase.StringLongestCommonSubsequenceWithMatches));
     }
 
@@ -687,14 +704,14 @@ public sealed class StringTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
-        var other = Fixture.NewKey("s2");
+        var other = NewKey("s2");
         session.Raw.StringSet(key, "abcde");
         session.Raw.StringSet(other, "ace");
         var matches = await session.Database.StringLongestCommonSubsequenceWithMatchesAsync(key, other);
-        Assert.True(matches.LongestMatchLength >= 1);
+        matches.LongestMatchLength.ShouldBeGreaterThanOrEqualTo(1);
         session.AssertObserved(nameof(IDatabase.StringLongestCommonSubsequenceWithMatchesAsync));
     }
 }

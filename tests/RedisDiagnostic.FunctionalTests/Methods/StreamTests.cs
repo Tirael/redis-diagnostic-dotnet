@@ -1,6 +1,3 @@
-using RedisDiagnostic.FunctionalTests.Infrastructure;
-using StackExchange.Redis;
-
 namespace RedisDiagnostic.FunctionalTests.Methods;
 
 [Collection(RedisCollection.Name)]
@@ -16,12 +13,12 @@ public sealed class StreamTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         var id = session.Database.StreamAdd(key, "f", "v");
-        Assert.False(id.IsNull);
-        Assert.Equal(1, session.Raw.StreamLength(key));
+        id.IsNull.ShouldBeFalse();
+        session.Raw.StreamLength(key).ShouldBe(1);
         session.AssertObserved(nameof(IDatabase.StreamAdd));
     }
 
@@ -31,11 +28,11 @@ public sealed class StreamTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         var id = await session.Database.StreamAddAsync(key, "f", "v");
-        Assert.False(id.IsNull);
+        id.IsNull.ShouldBeFalse();
         session.AssertObserved(nameof(IDatabase.StreamAddAsync));
     }
 
@@ -45,12 +42,12 @@ public sealed class StreamTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.StreamAdd(key, "f", "v");
         var length = session.Database.StreamLength(key);
-        Assert.Equal(1, length);
+        length.ShouldBe(1);
         session.AssertObserved(nameof(IDatabase.StreamLength));
     }
 
@@ -60,12 +57,12 @@ public sealed class StreamTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.StreamAdd(key, "f", "v");
         var length = await session.Database.StreamLengthAsync(key);
-        Assert.Equal(1, length);
+        length.ShouldBe(1);
         session.AssertObserved(nameof(IDatabase.StreamLengthAsync));
     }
 
@@ -75,12 +72,12 @@ public sealed class StreamTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.StreamAdd(key, "f", "v");
         var entries = session.Database.StreamRange(key);
-        Assert.Single(entries);
+        entries.Should().ContainSingle();
         session.AssertObserved(nameof(IDatabase.StreamRange));
     }
 
@@ -90,12 +87,12 @@ public sealed class StreamTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.StreamAdd(key, "f", "v");
         var entries = await session.Database.StreamRangeAsync(key);
-        Assert.Single(entries);
+        entries.Should().ContainSingle();
         session.AssertObserved(nameof(IDatabase.StreamRangeAsync));
     }
 
@@ -105,12 +102,12 @@ public sealed class StreamTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.StreamAdd(key, "f", "v");
         var entries = session.Database.StreamRead(key, "0-0");
-        Assert.Single(entries);
+        entries.Should().ContainSingle();
         session.AssertObserved(nameof(IDatabase.StreamRead));
     }
 
@@ -120,12 +117,12 @@ public sealed class StreamTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.StreamAdd(key, "f", "v");
         var entries = await session.Database.StreamReadAsync(key, "0-0");
-        Assert.Single(entries);
+        entries.Should().ContainSingle();
         session.AssertObserved(nameof(IDatabase.StreamReadAsync));
     }
 
@@ -135,12 +132,12 @@ public sealed class StreamTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.StreamAdd(key, "f", "v");
         var info = session.Database.StreamInfo(key);
-        Assert.Equal(1, info.Length);
+        info.Length.ShouldBe(1);
         session.AssertObserved(nameof(IDatabase.StreamInfo));
     }
 
@@ -150,12 +147,12 @@ public sealed class StreamTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.StreamAdd(key, "f", "v");
         var info = await session.Database.StreamInfoAsync(key);
-        Assert.Equal(1, info.Length);
+        info.Length.ShouldBe(1);
         session.AssertObserved(nameof(IDatabase.StreamInfoAsync));
     }
 
@@ -165,12 +162,12 @@ public sealed class StreamTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         var id = session.Raw.StreamAdd(key, "f", "v");
         var deleted = session.Database.StreamDelete(key, [id]);
-        Assert.Equal(1, deleted);
+        deleted.ShouldBe(1);
         session.AssertObserved(nameof(IDatabase.StreamDelete));
     }
 
@@ -180,12 +177,12 @@ public sealed class StreamTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         var id = session.Raw.StreamAdd(key, "f", "v");
         var deleted = await session.Database.StreamDeleteAsync(key, [id]);
-        Assert.Equal(1, deleted);
+        deleted.ShouldBe(1);
         session.AssertObserved(nameof(IDatabase.StreamDeleteAsync));
     }
 
@@ -195,13 +192,13 @@ public sealed class StreamTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.StreamAdd(key, "f", "v1");
         session.Raw.StreamAdd(key, "f", "v2");
         var trimmed = session.Database.StreamTrim(key, 1);
-        Assert.Equal(1, trimmed);
+        trimmed.ShouldBe(1);
         session.AssertObserved(nameof(IDatabase.StreamTrim));
     }
 
@@ -211,13 +208,13 @@ public sealed class StreamTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.StreamAdd(key, "f", "v1");
         session.Raw.StreamAdd(key, "f", "v2");
         var trimmed = await session.Database.StreamTrimAsync(key, 1);
-        Assert.Equal(1, trimmed);
+        trimmed.ShouldBe(1);
         session.AssertObserved(nameof(IDatabase.StreamTrimAsync));
     }
 
@@ -227,13 +224,13 @@ public sealed class StreamTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         var first = session.Raw.StreamAdd(key, "f", "v1");
         session.Raw.StreamAdd(key, "f", "v2");
         var trimmed = session.Database.StreamTrimByMinId(key, first);
-        Assert.True(trimmed >= 0);
+        trimmed.ShouldBeGreaterThanOrEqualTo(0);
         session.AssertObserved(nameof(IDatabase.StreamTrimByMinId));
     }
 
@@ -243,13 +240,13 @@ public sealed class StreamTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         var first = session.Raw.StreamAdd(key, "f", "v1");
         session.Raw.StreamAdd(key, "f", "v2");
         var trimmed = await session.Database.StreamTrimByMinIdAsync(key, first);
-        Assert.True(trimmed >= 0);
+        trimmed.ShouldBeGreaterThanOrEqualTo(0);
         session.AssertObserved(nameof(IDatabase.StreamTrimByMinIdAsync));
     }
 
@@ -259,12 +256,12 @@ public sealed class StreamTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.StreamAdd(key, "f", "v");
         var created = session.Database.StreamCreateConsumerGroup(key, "g", "0-0");
-        Assert.True(created);
+        created.ShouldBeTrue();
         session.AssertObserved(nameof(IDatabase.StreamCreateConsumerGroup));
     }
 
@@ -274,12 +271,12 @@ public sealed class StreamTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.StreamAdd(key, "f", "v");
         var created = await session.Database.StreamCreateConsumerGroupAsync(key, "g", "0-0");
-        Assert.True(created);
+        created.ShouldBeTrue();
         session.AssertObserved(nameof(IDatabase.StreamCreateConsumerGroupAsync));
     }
 
@@ -289,13 +286,13 @@ public sealed class StreamTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.StreamAdd(key, "f", "v");
         session.Raw.StreamCreateConsumerGroup(key, "g", "0-0");
         var groups = session.Database.StreamGroupInfo(key);
-        Assert.Single(groups);
+        groups.Should().ContainSingle();
         session.AssertObserved(nameof(IDatabase.StreamGroupInfo));
     }
 
@@ -305,13 +302,13 @@ public sealed class StreamTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.StreamAdd(key, "f", "v");
         session.Raw.StreamCreateConsumerGroup(key, "g", "0-0");
         var groups = await session.Database.StreamGroupInfoAsync(key);
-        Assert.Single(groups);
+        groups.Should().ContainSingle();
         session.AssertObserved(nameof(IDatabase.StreamGroupInfoAsync));
     }
 
@@ -321,13 +318,13 @@ public sealed class StreamTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.StreamAdd(key, "f", "v");
         session.Raw.StreamCreateConsumerGroup(key, "g", "0-0");
         var entries = session.Database.StreamReadGroup(key, "g", "c", ">");
-        Assert.Single(entries);
+        entries.Should().ContainSingle();
         session.AssertObserved(nameof(IDatabase.StreamReadGroup));
     }
 
@@ -337,13 +334,13 @@ public sealed class StreamTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.StreamAdd(key, "f", "v");
         session.Raw.StreamCreateConsumerGroup(key, "g", "0-0");
         var entries = await session.Database.StreamReadGroupAsync(key, "g", "c", ">");
-        Assert.Single(entries);
+        entries.Should().ContainSingle();
         session.AssertObserved(nameof(IDatabase.StreamReadGroupAsync));
     }
 
@@ -353,14 +350,14 @@ public sealed class StreamTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         var id = session.Raw.StreamAdd(key, "f", "v");
         session.Raw.StreamCreateConsumerGroup(key, "g", "0-0");
         session.Raw.StreamReadGroup(key, "g", "c", ">");
         var acked = session.Database.StreamAcknowledge(key, "g", id);
-        Assert.Equal(1, acked);
+        acked.ShouldBe(1);
         session.AssertObserved(nameof(IDatabase.StreamAcknowledge));
     }
 
@@ -370,14 +367,14 @@ public sealed class StreamTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         var id = session.Raw.StreamAdd(key, "f", "v");
         session.Raw.StreamCreateConsumerGroup(key, "g", "0-0");
         session.Raw.StreamReadGroup(key, "g", "c", ">");
         var acked = await session.Database.StreamAcknowledgeAsync(key, "g", id);
-        Assert.Equal(1, acked);
+        acked.ShouldBe(1);
         session.AssertObserved(nameof(IDatabase.StreamAcknowledgeAsync));
     }
 
@@ -387,14 +384,14 @@ public sealed class StreamTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.StreamAdd(key, "f", "v");
         session.Raw.StreamCreateConsumerGroup(key, "g", "0-0");
         session.Raw.StreamReadGroup(key, "g", "c", ">");
         var pending = session.Database.StreamPending(key, "g");
-        Assert.Equal(1, pending.PendingMessageCount);
+        pending.PendingMessageCount.ShouldBe(1);
         session.AssertObserved(nameof(IDatabase.StreamPending));
     }
 
@@ -404,14 +401,14 @@ public sealed class StreamTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.StreamAdd(key, "f", "v");
         session.Raw.StreamCreateConsumerGroup(key, "g", "0-0");
         session.Raw.StreamReadGroup(key, "g", "c", ">");
         var pending = await session.Database.StreamPendingAsync(key, "g");
-        Assert.Equal(1, pending.PendingMessageCount);
+        pending.PendingMessageCount.ShouldBe(1);
         session.AssertObserved(nameof(IDatabase.StreamPendingAsync));
     }
 
@@ -421,14 +418,14 @@ public sealed class StreamTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.StreamAdd(key, "f", "v");
         session.Raw.StreamCreateConsumerGroup(key, "g", "0-0");
         session.Raw.StreamReadGroup(key, "g", "c", ">");
         var pending = session.Database.StreamPendingMessages(key, "g", 10, "c");
-        Assert.Single(pending);
+        pending.Should().ContainSingle();
         session.AssertObserved(nameof(IDatabase.StreamPendingMessages));
     }
 
@@ -438,14 +435,14 @@ public sealed class StreamTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.StreamAdd(key, "f", "v");
         session.Raw.StreamCreateConsumerGroup(key, "g", "0-0");
         session.Raw.StreamReadGroup(key, "g", "c", ">");
         var pending = await session.Database.StreamPendingMessagesAsync(key, "g", 10, "c");
-        Assert.Single(pending);
+        pending.Should().ContainSingle();
         session.AssertObserved(nameof(IDatabase.StreamPendingMessagesAsync));
     }
 
@@ -455,14 +452,14 @@ public sealed class StreamTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.StreamAdd(key, "f", "v");
         session.Raw.StreamCreateConsumerGroup(key, "g", "0-0");
         session.Raw.StreamReadGroup(key, "g", "c", ">");
         var consumers = session.Database.StreamConsumerInfo(key, "g");
-        Assert.Single(consumers);
+        consumers.Should().ContainSingle();
         session.AssertObserved(nameof(IDatabase.StreamConsumerInfo));
     }
 
@@ -472,14 +469,14 @@ public sealed class StreamTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.StreamAdd(key, "f", "v");
         session.Raw.StreamCreateConsumerGroup(key, "g", "0-0");
         session.Raw.StreamReadGroup(key, "g", "c", ">");
         var consumers = await session.Database.StreamConsumerInfoAsync(key, "g");
-        Assert.Single(consumers);
+        consumers.Should().ContainSingle();
         session.AssertObserved(nameof(IDatabase.StreamConsumerInfoAsync));
     }
 
@@ -489,13 +486,13 @@ public sealed class StreamTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.StreamAdd(key, "f", "v");
         session.Raw.StreamCreateConsumerGroup(key, "g", "0-0");
         var set = session.Database.StreamConsumerGroupSetPosition(key, "g", "0-0");
-        Assert.True(set);
+        set.ShouldBeTrue();
         session.AssertObserved(nameof(IDatabase.StreamConsumerGroupSetPosition));
     }
 
@@ -505,13 +502,13 @@ public sealed class StreamTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.StreamAdd(key, "f", "v");
         session.Raw.StreamCreateConsumerGroup(key, "g", "0-0");
         var set = await session.Database.StreamConsumerGroupSetPositionAsync(key, "g", "0-0");
-        Assert.True(set);
+        set.ShouldBeTrue();
         session.AssertObserved(nameof(IDatabase.StreamConsumerGroupSetPositionAsync));
     }
 
@@ -521,14 +518,14 @@ public sealed class StreamTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.StreamAdd(key, "f", "v");
         session.Raw.StreamCreateConsumerGroup(key, "g", "0-0");
         var pending = session.Raw.StreamReadGroup(key, "g", "c1", ">");
         var claimed = session.Database.StreamClaim(key, "g", "c2", 0, [pending[0].Id]);
-        Assert.Single(claimed);
+        claimed.Should().ContainSingle();
         session.AssertObserved(nameof(IDatabase.StreamClaim));
     }
 
@@ -538,14 +535,14 @@ public sealed class StreamTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.StreamAdd(key, "f", "v");
         session.Raw.StreamCreateConsumerGroup(key, "g", "0-0");
         var pending = session.Raw.StreamReadGroup(key, "g", "c1", ">");
         var claimed = await session.Database.StreamClaimAsync(key, "g", "c2", 0, [pending[0].Id]);
-        Assert.Single(claimed);
+        claimed.Should().ContainSingle();
         session.AssertObserved(nameof(IDatabase.StreamClaimAsync));
     }
 
@@ -555,14 +552,14 @@ public sealed class StreamTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.StreamAdd(key, "f", "v");
         session.Raw.StreamCreateConsumerGroup(key, "g", "0-0");
         var pending = session.Raw.StreamReadGroup(key, "g", "c1", ">");
         var claimed = session.Database.StreamClaimIdsOnly(key, "g", "c2", 0, [pending[0].Id]);
-        Assert.Single(claimed);
+        claimed.Should().ContainSingle();
         session.AssertObserved(nameof(IDatabase.StreamClaimIdsOnly));
     }
 
@@ -572,14 +569,14 @@ public sealed class StreamTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.StreamAdd(key, "f", "v");
         session.Raw.StreamCreateConsumerGroup(key, "g", "0-0");
         var pending = session.Raw.StreamReadGroup(key, "g", "c1", ">");
         var claimed = await session.Database.StreamClaimIdsOnlyAsync(key, "g", "c2", 0, [pending[0].Id]);
-        Assert.Single(claimed);
+        claimed.Should().ContainSingle();
         session.AssertObserved(nameof(IDatabase.StreamClaimIdsOnlyAsync));
     }
 
@@ -589,14 +586,14 @@ public sealed class StreamTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.StreamAdd(key, "f", "v");
         session.Raw.StreamCreateConsumerGroup(key, "g", "0-0");
         session.Raw.StreamReadGroup(key, "g", "c1", ">");
         var claimed = session.Database.StreamAutoClaim(key, "g", "c2", 0, "0-0");
-        Assert.NotEmpty(claimed.ClaimedEntries);
+        claimed.ClaimedEntries.Should().NotBeEmpty();
         session.AssertObserved(nameof(IDatabase.StreamAutoClaim));
     }
 
@@ -606,14 +603,14 @@ public sealed class StreamTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.StreamAdd(key, "f", "v");
         session.Raw.StreamCreateConsumerGroup(key, "g", "0-0");
         session.Raw.StreamReadGroup(key, "g", "c1", ">");
         var claimed = await session.Database.StreamAutoClaimAsync(key, "g", "c2", 0, "0-0");
-        Assert.NotEmpty(claimed.ClaimedEntries);
+        claimed.ClaimedEntries.Should().NotBeEmpty();
         session.AssertObserved(nameof(IDatabase.StreamAutoClaimAsync));
     }
 
@@ -623,14 +620,14 @@ public sealed class StreamTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.StreamAdd(key, "f", "v");
         session.Raw.StreamCreateConsumerGroup(key, "g", "0-0");
         session.Raw.StreamReadGroup(key, "g", "c1", ">");
         var claimed = session.Database.StreamAutoClaimIdsOnly(key, "g", "c2", 0, "0-0");
-        Assert.NotEmpty(claimed.ClaimedIds);
+        claimed.ClaimedIds.Should().NotBeEmpty();
         session.AssertObserved(nameof(IDatabase.StreamAutoClaimIdsOnly));
     }
 
@@ -640,14 +637,14 @@ public sealed class StreamTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.StreamAdd(key, "f", "v");
         session.Raw.StreamCreateConsumerGroup(key, "g", "0-0");
         session.Raw.StreamReadGroup(key, "g", "c1", ">");
         var claimed = await session.Database.StreamAutoClaimIdsOnlyAsync(key, "g", "c2", 0, "0-0");
-        Assert.NotEmpty(claimed.ClaimedIds);
+        claimed.ClaimedIds.Should().NotBeEmpty();
         session.AssertObserved(nameof(IDatabase.StreamAutoClaimIdsOnlyAsync));
     }
 
@@ -657,14 +654,14 @@ public sealed class StreamTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.StreamAdd(key, "f", "v");
         session.Raw.StreamCreateConsumerGroup(key, "g", "0-0");
         session.Raw.StreamReadGroup(key, "g", "c", ">");
         var pending = session.Database.StreamDeleteConsumer(key, "g", "c");
-        Assert.True(pending >= 0);
+        pending.ShouldBeGreaterThanOrEqualTo(0);
         session.AssertObserved(nameof(IDatabase.StreamDeleteConsumer));
     }
 
@@ -674,14 +671,14 @@ public sealed class StreamTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.StreamAdd(key, "f", "v");
         session.Raw.StreamCreateConsumerGroup(key, "g", "0-0");
         session.Raw.StreamReadGroup(key, "g", "c", ">");
         var pending = await session.Database.StreamDeleteConsumerAsync(key, "g", "c");
-        Assert.True(pending >= 0);
+        pending.ShouldBeGreaterThanOrEqualTo(0);
         session.AssertObserved(nameof(IDatabase.StreamDeleteConsumerAsync));
     }
 
@@ -691,13 +688,13 @@ public sealed class StreamTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.StreamAdd(key, "f", "v");
         session.Raw.StreamCreateConsumerGroup(key, "g", "0-0");
         var deleted = session.Database.StreamDeleteConsumerGroup(key, "g");
-        Assert.True(deleted);
+        deleted.ShouldBeTrue();
         session.AssertObserved(nameof(IDatabase.StreamDeleteConsumerGroup));
     }
 
@@ -707,13 +704,13 @@ public sealed class StreamTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.StreamAdd(key, "f", "v");
         session.Raw.StreamCreateConsumerGroup(key, "g", "0-0");
         var deleted = await session.Database.StreamDeleteConsumerGroupAsync(key, "g");
-        Assert.True(deleted);
+        deleted.ShouldBeTrue();
         session.AssertObserved(nameof(IDatabase.StreamDeleteConsumerGroupAsync));
     }
 
@@ -723,7 +720,7 @@ public sealed class StreamTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         var id = session.Raw.StreamAdd(key, "f", "v");
@@ -746,7 +743,7 @@ public sealed class StreamTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         var id = session.Raw.StreamAdd(key, "f", "v");
@@ -761,5 +758,31 @@ public sealed class StreamTests : RedisTestBase
         {
             session.AssertObserved(nameof(IDatabase.StreamAcknowledgeAndDeleteAsync), PrometheusRedisMethodMetrics.ResultError);
         }
+    }
+
+    [Fact]
+    [RedisMethod(nameof(IDatabase.StreamConfigure))]
+    public void Given_redis_When_StreamConfigure_Then_state_and_metric_are_observed()
+    {
+        var session = Fixture.CreateSession();
+        var key = NewKey();
+        session.Raw.StreamAdd(key, "f", "v");
+        session.InvokeAndObserve(
+            nameof(IDatabase.StreamConfigure),
+            () => session.Database.StreamConfigure(key, new() { IdmpDuration = 1 }));
+    }
+
+    [Fact]
+    [RedisMethod(nameof(IDatabase.StreamNegativeAcknowledge))]
+    public void Given_redis_When_StreamNegativeAcknowledge_Then_state_and_metric_are_observed()
+    {
+        var session = Fixture.CreateSession();
+        var key = NewKey();
+        var id = session.Raw.StreamAdd(key, "f", "v");
+        session.Raw.StreamCreateConsumerGroup(key, "g", "0-0");
+        session.Raw.StreamReadGroup(key, "g", "c", ">");
+        session.InvokeAndObserve(
+            nameof(IDatabase.StreamNegativeAcknowledge),
+            () => session.Database.StreamNegativeAcknowledge(key, "g", StreamNackMode.Silent, id));
     }
 }

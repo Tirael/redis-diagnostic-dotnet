@@ -1,4 +1,9 @@
+global using System.Reflection;
+global using Prometheus;
 global using RedisDiagnostic;
 global using RedisDiagnostic.FunctionalTests.Infrastructure;
+global using Shouldly;
+global using AwesomeAssertions;
 global using StackExchange.Redis;
+global using Testcontainers.Redis;
 global using Xunit;

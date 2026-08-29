@@ -1,7 +1,3 @@
-using System.Reflection;
-using RedisDiagnostic.FunctionalTests.Infrastructure;
-using StackExchange.Redis;
-
 namespace RedisDiagnostic.FunctionalTests.Completeness;
 
 public sealed class IDatabaseMethodCoverageTests
@@ -26,8 +22,6 @@ public sealed class IDatabaseMethodCoverageTests
 
         var missing = required.Where(name => !covered.Contains(name)).ToArray();
 
-        Assert.True(
-            missing.Length == 0,
-            "Missing functional tests for IDatabase methods: " + string.Join(", ", missing));
+        missing.Should().BeEmpty("missing IDatabase methods: {0}", string.Join(", ", missing));
     }
 }
