@@ -2,52 +2,41 @@ namespace RedisDiagnostic.SourceGenerator;
 
 internal static class InstrumentedMethodWriter
 {
-    private static readonly HashSet<string> s_passThroughMethods = new(StringComparer.Ordinal)
+    internal static void Write(StringBuilder builder, IMethodSymbol method)
     {
-        "CreateBatch",
-        "CreateTransaction",
-    };
+        builder.AppendLine();
+        builder.Append("    public ");
+        AppendReturnTypeAndName(builder, method);
+        AppendParameters(builder, method);
+        AppendConstraints(builder, method);
+        builder.AppendLine();
+        AppendBody(builder, method, BuildInvocation(method));
+    }
 
-    internal static void Write(StringBuilder builder, IMethodSymbol method, bool explicitInterface)
+    internal static void WriteExplicit(StringBuilder builder, IMethodSymbol method)
     {
         builder.AppendLine();
         builder.Append("    ");
-        if (!explicitInterface)
-        {
-            builder.Append("public ");
-        }
-
-        builder.Append(CSharpSymbolFormatter.FormatType(method.ReturnType));
-        builder.Append(' ');
-        if (explicitInterface)
-        {
-            builder.Append(CSharpSymbolFormatter.FormatType(method.ContainingType)).Append('.');
-        }
-
+        builder.Append(CSharpSymbolFormatter.FormatType(method.ReturnType)).Append(' ');
+        builder.Append(CSharpSymbolFormatter.FormatType(method.ContainingType)).Append('.');
         builder.Append(method.Name);
         AppendTypeArguments(builder, method);
-        builder.Append('(');
-        for (var i = 0; i < method.Parameters.Length; i++)
-        {
-            if (i > 0)
-            {
-                builder.Append(", ");
-            }
-
-            AppendParameter(builder, method.Parameters[i], includeDefault: !explicitInterface);
-        }
-
-        builder.Append(')');
-        if (!explicitInterface)
-        {
-            AppendConstraints(builder, method);
-        }
-
+        AppendParametersWithoutDefaults(builder, method);
         builder.AppendLine();
-        builder.Append("        => ");
+        AppendBody(builder, method, BuildExplicitInvocation(method));
+    }
 
-        var invocation = BuildInvocation(method, explicitInterface);
-        if (s_passThroughMethods.Contains(method.Name))
+    private static void AppendReturnTypeAndName(StringBuilder builder, IMethodSymbol method)
+    {
+        builder.Append(CSharpSymbolFormatter.FormatType(method.ReturnType)).Append(' ');
+        builder.Append(method.Name);
+        AppendTypeArguments(builder, method);
+    }
+
+    private static void AppendBody(StringBuilder builder, IMethodSymbol method, string invocation)
+    {
+        builder.Append("        => ");
+        if (method.Name is "CreateBatch" or "CreateTransaction")
         {
             builder.Append(invocation).AppendLine(";");
             return;
@@ -58,23 +47,50 @@ internal static class InstrumentedMethodWriter
             .Append("), () => ").Append(invocation).AppendLine(");");
     }
 
-    private static void AppendParameter(StringBuilder builder, IParameterSymbol parameter, bool includeDefault)
+    private static void AppendParameters(StringBuilder builder, IMethodSymbol method)
+    {
+        builder.Append('(');
+        for (var i = 0; i < method.Parameters.Length; i++)
+        {
+            if (i is > 0)
+                builder.Append(", ");
+
+            AppendParameter(builder, method.Parameters[i]);
+        }
+
+        builder.Append(')');
+    }
+
+    private static void AppendParametersWithoutDefaults(StringBuilder builder, IMethodSymbol method)
+    {
+        builder.Append('(');
+        for (var i = 0; i < method.Parameters.Length; i++)
+        {
+            if (i is > 0)
+                builder.Append(", ");
+
+            AppendParameterCore(builder, method.Parameters[i]);
+        }
+
+        builder.Append(')');
+    }
+
+    private static void AppendParameter(StringBuilder builder, IParameterSymbol parameter)
+    {
+        AppendParameterCore(builder, parameter);
+        if (parameter is { HasExplicitDefaultValue: true })
+            builder.Append(" = ").Append(CSharpDefaultValueFormatter.Format(parameter));
+    }
+
+    private static void AppendParameterCore(StringBuilder builder, IParameterSymbol parameter)
     {
         CSharpSymbolFormatter.AppendRefKind(builder, parameter.RefKind);
         if (parameter is { IsParams: true })
-        {
             builder.Append("params ");
-        }
 
         builder.Append(CSharpSymbolFormatter.FormatType(parameter.Type))
             .Append(' ')
             .Append(CSharpSymbolFormatter.EscapeIdentifier(parameter.Name));
-        if (!includeDefault || parameter is not { HasExplicitDefaultValue: true })
-        {
-            return;
-        }
-
-        builder.Append(" = ").Append(CSharpDefaultValueFormatter.Format(parameter));
     }
 
     private static void AppendConstraints(StringBuilder builder, IMethodSymbol method)
@@ -83,9 +99,7 @@ internal static class InstrumentedMethodWriter
         {
             var constraints = CollectConstraints(typeParameter);
             if (constraints.Count is 0)
-            {
                 continue;
-            }
 
             builder.Append(" where ").Append(typeParameter.Name).Append(" : ").Append(string.Join(", ", constraints));
         }
@@ -94,62 +108,46 @@ internal static class InstrumentedMethodWriter
     private static List<string> CollectConstraints(ITypeParameterSymbol typeParameter)
     {
         List<string> constraints = new();
-        if (typeParameter.HasReferenceTypeConstraint)
-        {
+        if (typeParameter is { HasReferenceTypeConstraint: true })
             constraints.Add(typeParameter.ReferenceTypeConstraintNullableAnnotation is NullableAnnotation.Annotated
                 ? "class?"
                 : "class");
-        }
 
-        if (typeParameter.HasValueTypeConstraint)
-        {
+        if (typeParameter is { HasValueTypeConstraint: true })
             constraints.Add("struct");
-        }
 
-        if (typeParameter.HasNotNullConstraint)
-        {
+        if (typeParameter is { HasNotNullConstraint: true })
             constraints.Add("notnull");
-        }
 
-        if (typeParameter.HasUnmanagedTypeConstraint)
-        {
+        if (typeParameter is { HasUnmanagedTypeConstraint: true })
             constraints.Add("unmanaged");
-        }
 
         foreach (var constraintType in typeParameter.ConstraintTypes)
-        {
             constraints.Add(CSharpSymbolFormatter.FormatType(constraintType));
-        }
 
-        if (typeParameter.HasConstructorConstraint)
-        {
+        if (typeParameter is { HasConstructorConstraint: true })
             constraints.Add("new()");
-        }
 
         return constraints;
     }
 
-    private static string BuildInvocation(IMethodSymbol method, bool explicitInterface)
+    private static string BuildInvocation(IMethodSymbol method) =>
+        BuildCall(method, "_inner.");
+
+    private static string BuildExplicitInvocation(IMethodSymbol method) =>
+        BuildCall(method, "((" + CSharpSymbolFormatter.FormatType(method.ContainingType) + ")_inner).");
+
+    private static string BuildCall(IMethodSymbol method, string receiver)
     {
         StringBuilder builder = new();
-        if (explicitInterface)
-        {
-            builder.Append("((").Append(CSharpSymbolFormatter.FormatType(method.ContainingType)).Append(")_inner).");
-        }
-        else
-        {
-            builder.Append("_inner.");
-        }
-
+        builder.Append(receiver);
         builder.Append(method.Name);
         AppendTypeArguments(builder, method);
         builder.Append('(');
         for (var i = 0; i < method.Parameters.Length; i++)
         {
-            if (i > 0)
-            {
+            if (i is > 0)
                 builder.Append(", ");
-            }
 
             CSharpSymbolFormatter.AppendRefKind(builder, method.Parameters[i].RefKind);
             builder.Append(CSharpSymbolFormatter.EscapeIdentifier(method.Parameters[i].Name));
@@ -161,18 +159,14 @@ internal static class InstrumentedMethodWriter
 
     private static void AppendTypeArguments(StringBuilder builder, IMethodSymbol method)
     {
-        if (method.TypeParameters.Length is 0)
-        {
+        if (method is { TypeParameters.Length: 0 })
             return;
-        }
 
         builder.Append('<');
         for (var i = 0; i < method.TypeParameters.Length; i++)
         {
-            if (i > 0)
-            {
+            if (i is > 0)
                 builder.Append(", ");
-            }
 
             builder.Append(method.TypeParameters[i].Name);
         }

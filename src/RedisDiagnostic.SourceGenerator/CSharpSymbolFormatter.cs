@@ -9,34 +9,18 @@ internal static class CSharpSymbolFormatter
                 | SymbolDisplayMiscellaneousOptions.IncludeNullableReferenceTypeModifier
                 | SymbolDisplayMiscellaneousOptions.EscapeKeywordIdentifiers));
 
-    internal static string EscapeIdentifier(string name)
-    {
-        if (SyntaxFacts.GetKeywordKind(name) is SyntaxKind.None
-            && SyntaxFacts.GetContextualKeywordKind(name) is SyntaxKind.None)
-        {
-            return name;
-        }
+    internal static string EscapeIdentifier(string name) =>
+        SyntaxFacts.GetKeywordKind(name) is not SyntaxKind.None
+        || SyntaxFacts.GetContextualKeywordKind(name) is not SyntaxKind.None
+            ? "@" + name
+            : name;
 
-        return "@" + name;
-    }
-
-    internal static void AppendRefKind(StringBuilder builder, RefKind refKind)
-    {
-        if (refKind is RefKind.Ref)
+    internal static void AppendRefKind(StringBuilder builder, RefKind refKind) =>
+        builder.Append(refKind switch
         {
-            builder.Append("ref ");
-            return;
-        }
-
-        if (refKind is RefKind.Out)
-        {
-            builder.Append("out ");
-            return;
-        }
-
-        if (refKind is RefKind.In)
-        {
-            builder.Append("in ");
-        }
-    }
+            RefKind.Ref => "ref ",
+            RefKind.Out => "out ",
+            RefKind.In => "in ",
+            _ => string.Empty,
+        });
 }

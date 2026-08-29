@@ -2,21 +2,12 @@ namespace RedisDiagnostic.SourceGenerator;
 
 internal static class CSharpDefaultValueFormatter
 {
-    internal static string Format(IParameterSymbol parameter)
+    internal static string Format(IParameterSymbol parameter) => parameter.ExplicitDefaultValue switch
     {
-        var value = parameter.ExplicitDefaultValue;
-        if (value is null)
-        {
-            return FormatNullDefault(parameter.Type);
-        }
-
-        if (GetEnumType(parameter.Type) is { } enumType)
-        {
-            return FormatEnumDefault(enumType, value);
-        }
-
-        return FormatPrimitive(value);
-    }
+        null => FormatNullDefault(parameter.Type),
+        var value when GetEnumType(parameter.Type) is { } enumType => FormatEnumDefault(enumType, value),
+        var value => FormatPrimitive(value),
+    };
 
     private static string FormatNullDefault(ITypeSymbol type) =>
         IsNonNullableValueType(type) ? "default" : "null";
@@ -57,78 +48,43 @@ internal static class CSharpDefaultValueFormatter
         _ => Convert.ToString(value, CultureInfo.InvariantCulture) ?? "0",
     };
 
-    private static string FormatFloat(float number)
+    private static string FormatFloat(float number) => number switch
     {
-        if (number is float.NegativeInfinity)
-        {
-            return "float.NegativeInfinity";
-        }
+        float.NegativeInfinity => "float.NegativeInfinity",
+        float.PositiveInfinity => "float.PositiveInfinity",
+        _ when float.IsNaN(number) => "float.NaN",
+        _ => number.ToString("R", CultureInfo.InvariantCulture) + "F",
+    };
 
-        if (number is float.PositiveInfinity)
-        {
-            return "float.PositiveInfinity";
-        }
-
-        if (float.IsNaN(number))
-        {
-            return "float.NaN";
-        }
-
-        return number.ToString("R", CultureInfo.InvariantCulture) + "F";
-    }
-
-    private static string FormatDouble(double number)
+    private static string FormatDouble(double number) => number switch
     {
-        if (number is double.NegativeInfinity)
-        {
-            return "double.NegativeInfinity";
-        }
-
-        if (number is double.PositiveInfinity)
-        {
-            return "double.PositiveInfinity";
-        }
-
-        if (double.IsNaN(number))
-        {
-            return "double.NaN";
-        }
-
-        return number.ToString("R", CultureInfo.InvariantCulture) + "D";
-    }
+        double.NegativeInfinity => "double.NegativeInfinity",
+        double.PositiveInfinity => "double.PositiveInfinity",
+        _ when double.IsNaN(number) => "double.NaN",
+        _ => number.ToString("R", CultureInfo.InvariantCulture) + "D",
+    };
 
     private static string FormatEnumDefault(INamedTypeSymbol enumType, object value)
     {
         var field = enumType.GetMembers()
             .OfType<IFieldSymbol>()
             .FirstOrDefault(member => member is { HasConstantValue: true } && Equals(member.ConstantValue, value));
-        if (field is null)
-        {
-            return "(" + CSharpSymbolFormatter.FormatType(enumType) + ")" + Convert.ToString(value, CultureInfo.InvariantCulture);
-        }
-
-        return CSharpSymbolFormatter.FormatType(enumType) + "." + field.Name;
+        return field is { } named
+            ? CSharpSymbolFormatter.FormatType(enumType) + "." + named.Name
+            : "(" + CSharpSymbolFormatter.FormatType(enumType) + ")" + Convert.ToString(value, CultureInfo.InvariantCulture);
     }
 
-    private static INamedTypeSymbol? GetEnumType(ITypeSymbol type)
+    private static INamedTypeSymbol? GetEnumType(ITypeSymbol type) => type switch
     {
-        if (type is INamedTypeSymbol { TypeKind: TypeKind.Enum } enumType)
+        INamedTypeSymbol { TypeKind: TypeKind.Enum } enumType => enumType,
+        INamedTypeSymbol
         {
-            return enumType;
-        }
-
-        if (type is INamedTypeSymbol
-            {
-                OriginalDefinition.SpecialType: SpecialType.System_Nullable_T,
-                TypeArguments.Length: 1
-            } named
-            && named.TypeArguments[0] is INamedTypeSymbol { TypeKind: TypeKind.Enum } underlying)
-        {
-            return underlying;
-        }
-
-        return null;
-    }
+            OriginalDefinition.SpecialType: SpecialType.System_Nullable_T,
+            TypeArguments.Length: 1
+        } named
+            when named.TypeArguments[0] is INamedTypeSymbol { TypeKind: TypeKind.Enum } underlying => underlying,
+        _ => null,
+    };
 
     private static bool IsNonNullableValueType(ITypeSymbol type) =>
         type is { IsValueType: true, OriginalDefinition.SpecialType: not SpecialType.System_Nullable_T };

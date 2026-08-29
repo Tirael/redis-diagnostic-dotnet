@@ -133,9 +133,7 @@ public sealed class VectorSetTests : RedisTestBase
             (database, key) =>
             {
                 foreach (var member in database.VectorSetRangeEnumerate(key, "-", "+", 10))
-                {
                     _ = member;
-                }
             });
     }
 

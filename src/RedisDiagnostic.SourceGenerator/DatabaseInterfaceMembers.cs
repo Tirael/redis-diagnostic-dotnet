@@ -5,16 +5,12 @@ internal static class DatabaseInterfaceMembers
     internal static IEnumerable<ISymbol> Enumerate(INamedTypeSymbol databaseType)
     {
         foreach (var member in EnumerateInstanceMembers(databaseType))
-        {
             yield return member;
-        }
 
         foreach (var iface in databaseType.AllInterfaces)
         {
             foreach (var member in EnumerateInstanceMembers(iface))
-            {
                 yield return member;
-            }
         }
     }
 
@@ -22,10 +18,8 @@ internal static class DatabaseInterfaceMembers
     {
         StringBuilder builder = new();
         builder.Append("M:").Append(method.Name);
-        if (method.TypeParameters.Length is not 0)
-        {
+        if (method is { TypeParameters.Length: not 0 })
             builder.Append('`').Append(method.TypeParameters.Length);
-        }
 
         AppendParameterTypes(builder, method);
         return builder.ToString();
@@ -35,10 +29,8 @@ internal static class DatabaseInterfaceMembers
     {
         foreach (var member in type.GetMembers())
         {
-            if (member.IsStatic)
-            {
+            if (member is { IsStatic: true })
                 continue;
-            }
 
             yield return member;
         }
@@ -49,10 +41,8 @@ internal static class DatabaseInterfaceMembers
         builder.Append('(');
         for (var i = 0; i < method.Parameters.Length; i++)
         {
-            if (i > 0)
-            {
+            if (i is > 0)
                 builder.Append(',');
-            }
 
             var parameter = method.Parameters[i];
             builder.Append(parameter.RefKind).Append(':');

@@ -10,25 +10,7 @@ internal static class InstrumentedDatabaseSourceWriter
         Dictionary<string, IMethodSymbol> emitted = new(StringComparer.Ordinal);
         HashSet<string> emittedProperties = new(StringComparer.Ordinal);
         foreach (var member in DatabaseInterfaceMembers.Enumerate(databaseType))
-        {
-            if (member is IPropertySymbol property)
-            {
-                if (!emittedProperties.Add(property.Name))
-                {
-                    continue;
-                }
-
-                InstrumentedPropertyWriter.Write(builder, property);
-                continue;
-            }
-
-            if (member is not IMethodSymbol { MethodKind: MethodKind.Ordinary } method)
-            {
-                continue;
-            }
-
-            AppendUniqueMethod(builder, method, emitted);
-        }
+            AppendMember(builder, member, emitted, emittedProperties);
 
         builder.AppendLine("}");
         return builder.ToString();
@@ -57,6 +39,26 @@ internal static class InstrumentedDatabaseSourceWriter
         builder.AppendLine("    }");
     }
 
+    private static void AppendMember(
+        StringBuilder builder,
+        ISymbol member,
+        Dictionary<string, IMethodSymbol> emitted,
+        HashSet<string> emittedProperties)
+    {
+        switch (member)
+        {
+            case IPropertySymbol property:
+                if (!emittedProperties.Add(property.Name))
+                    return;
+
+                InstrumentedPropertyWriter.Write(builder, property);
+                return;
+            case IMethodSymbol { MethodKind: MethodKind.Ordinary } method:
+                AppendUniqueMethod(builder, method, emitted);
+                return;
+        }
+    }
+
     private static void AppendUniqueMethod(
         StringBuilder builder,
         IMethodSymbol method,
@@ -66,15 +68,13 @@ internal static class InstrumentedDatabaseSourceWriter
         if (!emitted.TryGetValue(key, out var existing))
         {
             emitted[key] = method;
-            InstrumentedMethodWriter.Write(builder, method, explicitInterface: false);
+            InstrumentedMethodWriter.Write(builder, method);
             return;
         }
 
         if (SymbolEqualityComparer.Default.Equals(existing.ReturnType, method.ReturnType))
-        {
             return;
-        }
 
-        InstrumentedMethodWriter.Write(builder, method, explicitInterface: true);
+        InstrumentedMethodWriter.WriteExplicit(builder, method);
     }
 }

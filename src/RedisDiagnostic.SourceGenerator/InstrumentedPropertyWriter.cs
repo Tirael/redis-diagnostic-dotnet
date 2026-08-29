@@ -8,15 +8,11 @@ internal static class InstrumentedPropertyWriter
         builder.Append("    public ").Append(CSharpSymbolFormatter.FormatType(property.Type)).Append(' ').Append(property.Name);
         builder.AppendLine();
         builder.AppendLine("    {");
-        if (property.GetMethod is not null)
-        {
+        if (property is { GetMethod: not null })
             builder.Append("        get => _inner.").Append(property.Name).AppendLine(";");
-        }
 
-        if (property.SetMethod is not null)
-        {
+        if (property is { SetMethod: not null })
             builder.Append("        set => _inner.").Append(property.Name).AppendLine(" = value;");
-        }
 
         builder.AppendLine("    }");
     }

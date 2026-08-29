@@ -5,12 +5,11 @@ internal class ConnectionMultiplexerStub : DispatchProxy
     protected override object? Invoke(MethodInfo? targetMethod, object?[]? args)
     {
         ArgumentNullException.ThrowIfNull(targetMethod);
-        if (targetMethod.Name is not nameof(IConnectionMultiplexer.GetDatabase))
+        return targetMethod.Name switch
         {
-            return DispatchProxyDefaults.GetDefault(targetMethod.ReturnType);
-        }
-
-        return DispatchProxy.Create<IDatabase, DatabaseStub>();
+            nameof(IConnectionMultiplexer.GetDatabase) => DispatchProxy.Create<IDatabase, DatabaseStub>(),
+            _ => DispatchProxyDefaults.GetDefault(targetMethod.ReturnType),
+        };
     }
 }
 
@@ -25,24 +24,18 @@ internal class DatabaseStub : DispatchProxy
 
 internal static class DispatchProxyDefaults
 {
-    public static object? GetDefault(Type type)
+    public static object? GetDefault(Type type) => type switch
     {
-        if (type == typeof(void))
-        {
-            return null;
-        }
+        var t when t == typeof(void) => null,
+        var t when t == typeof(Task) => Task.CompletedTask,
+        { IsGenericType: true } t when t.GetGenericTypeDefinition() == typeof(Task<>) => FromResult(t),
+        { IsValueType: true } => Activator.CreateInstance(type),
+        _ => null,
+    };
 
-        if (type == typeof(Task))
-        {
-            return Task.CompletedTask;
-        }
-
-        if (type is not { IsGenericType: true } || type.GetGenericTypeDefinition() != typeof(Task<>))
-        {
-            return type.IsValueType ? Activator.CreateInstance(type) : null;
-        }
-
-        var resultType = type.GetGenericArguments()[0];
+    private static object? FromResult(Type taskType)
+    {
+        var resultType = taskType.GetGenericArguments()[0];
         var result = resultType.IsValueType ? Activator.CreateInstance(resultType) : null;
         return typeof(Task)
             .GetMethod(nameof(Task.FromResult))!
