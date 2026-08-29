@@ -6,7 +6,7 @@ namespace RedisDiagnostic.FunctionalTests.Infrastructure;
 
 public sealed class RedisFixture : IAsyncLifetime
 {
-    private readonly RedisContainer _container = new RedisBuilder("redis:7.4-alpine")
+    private readonly RedisContainer _container = new RedisBuilder("redis:8-alpine")
         .WithCommand("redis-server", "--enable-debug-command", "yes")
         .Build();
 

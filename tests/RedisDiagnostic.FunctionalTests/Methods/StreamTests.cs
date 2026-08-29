@@ -762,4 +762,30 @@ public sealed class StreamTests : RedisTestBase
             session.AssertObserved(nameof(IDatabase.StreamAcknowledgeAndDeleteAsync), PrometheusRedisMethodMetrics.ResultError);
         }
     }
+
+    [Fact]
+    [RedisMethod(nameof(IDatabase.StreamConfigure))]
+    public void Given_redis_When_StreamConfigure_Then_state_and_metric_are_observed()
+    {
+        var session = Fixture.CreateSession();
+        var key = Fixture.NewKey();
+        session.Raw.StreamAdd(key, "f", "v");
+        session.InvokeAndObserve(
+            nameof(IDatabase.StreamConfigure),
+            () => session.Database.StreamConfigure(key, new StreamConfiguration { IdmpDuration = 1 }));
+    }
+
+    [Fact]
+    [RedisMethod(nameof(IDatabase.StreamNegativeAcknowledge))]
+    public void Given_redis_When_StreamNegativeAcknowledge_Then_state_and_metric_are_observed()
+    {
+        var session = Fixture.CreateSession();
+        var key = Fixture.NewKey();
+        var id = session.Raw.StreamAdd(key, "f", "v");
+        session.Raw.StreamCreateConsumerGroup(key, "g", "0-0");
+        session.Raw.StreamReadGroup(key, "g", "c", ">");
+        session.InvokeAndObserve(
+            nameof(IDatabase.StreamNegativeAcknowledge),
+            () => session.Database.StreamNegativeAcknowledge(key, "g", StreamNackMode.Silent, id));
+    }
 }
