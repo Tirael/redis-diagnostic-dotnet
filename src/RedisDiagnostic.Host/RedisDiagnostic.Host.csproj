@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <PropertyGroup>
+    <RootNamespace>RedisDiagnostic.Host</RootNamespace>
+    <AssemblyName>RedisDiagnostic.Host</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="prometheus-net.AspNetCore" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\RedisDiagnostic\RedisDiagnostic.csproj" />
+  </ItemGroup>
+</Project>
