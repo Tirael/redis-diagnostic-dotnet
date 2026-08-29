@@ -78,14 +78,14 @@ internal static class InstrumentedMethodWriter
     private static void AppendParameter(StringBuilder builder, IParameterSymbol parameter)
     {
         AppendParameterCore(builder, parameter);
-        if (parameter is { HasExplicitDefaultValue: true })
+        if (parameter.HasExplicitDefaultValue)
             builder.Append(" = ").Append(CSharpDefaultValueFormatter.Format(parameter));
     }
 
     private static void AppendParameterCore(StringBuilder builder, IParameterSymbol parameter)
     {
         CSharpSymbolFormatter.AppendRefKind(builder, parameter.RefKind);
-        if (parameter is { IsParams: true })
+        if (parameter.IsParams)
             builder.Append("params ");
 
         builder.Append(CSharpSymbolFormatter.FormatType(parameter.Type))
@@ -108,24 +108,24 @@ internal static class InstrumentedMethodWriter
     private static List<string> CollectConstraints(ITypeParameterSymbol typeParameter)
     {
         List<string> constraints = new();
-        if (typeParameter is { HasReferenceTypeConstraint: true })
+        if (typeParameter.HasReferenceTypeConstraint)
             constraints.Add(typeParameter.ReferenceTypeConstraintNullableAnnotation is NullableAnnotation.Annotated
                 ? "class?"
                 : "class");
 
-        if (typeParameter is { HasValueTypeConstraint: true })
+        if (typeParameter.HasValueTypeConstraint)
             constraints.Add("struct");
 
-        if (typeParameter is { HasNotNullConstraint: true })
+        if (typeParameter.HasNotNullConstraint)
             constraints.Add("notnull");
 
-        if (typeParameter is { HasUnmanagedTypeConstraint: true })
+        if (typeParameter.HasUnmanagedTypeConstraint)
             constraints.Add("unmanaged");
 
         foreach (var constraintType in typeParameter.ConstraintTypes)
             constraints.Add(CSharpSymbolFormatter.FormatType(constraintType));
 
-        if (typeParameter is { HasConstructorConstraint: true })
+        if (typeParameter.HasConstructorConstraint)
             constraints.Add("new()");
 
         return constraints;
@@ -159,7 +159,7 @@ internal static class InstrumentedMethodWriter
 
     private static void AppendTypeArguments(StringBuilder builder, IMethodSymbol method)
     {
-        if (method is { TypeParameters.Length: 0 })
+        if (method.TypeParameters.Length is 0)
             return;
 
         builder.Append('<');

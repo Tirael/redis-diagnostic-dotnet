@@ -18,7 +18,7 @@ internal static class DatabaseInterfaceMembers
     {
         StringBuilder builder = new();
         builder.Append("M:").Append(method.Name);
-        if (method is { TypeParameters.Length: not 0 })
+        if (method.TypeParameters.Length is not 0)
             builder.Append('`').Append(method.TypeParameters.Length);
 
         AppendParameterTypes(builder, method);
@@ -29,7 +29,7 @@ internal static class DatabaseInterfaceMembers
     {
         foreach (var member in type.GetMembers())
         {
-            if (member is { IsStatic: true })
+            if (member.IsStatic)
                 continue;
 
             yield return member;

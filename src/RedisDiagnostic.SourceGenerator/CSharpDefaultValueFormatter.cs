@@ -5,7 +5,7 @@ internal static class CSharpDefaultValueFormatter
     internal static string Format(IParameterSymbol parameter) => parameter.ExplicitDefaultValue switch
     {
         null => FormatNullDefault(parameter.Type),
-        var value when GetEnumType(parameter.Type) is { } enumType => FormatEnumDefault(enumType, value),
+        var value when GetEnumType(parameter.Type) is INamedTypeSymbol enumType => FormatEnumDefault(enumType, value),
         var value => FormatPrimitive(value),
     };
 
@@ -28,7 +28,7 @@ internal static class CSharpDefaultValueFormatter
     };
 
     private static string FormatTimeSpan(TimeSpan duration) =>
-        duration is { Ticks: 0 }
+        duration.Ticks is 0
             ? "global::System.TimeSpan.Zero"
             : "new global::System.TimeSpan(" + duration.Ticks.ToString(CultureInfo.InvariantCulture) + "L)";
 
@@ -68,9 +68,9 @@ internal static class CSharpDefaultValueFormatter
     {
         var field = enumType.GetMembers()
             .OfType<IFieldSymbol>()
-            .FirstOrDefault(member => member is { HasConstantValue: true } && Equals(member.ConstantValue, value));
-        return field is { } named
-            ? CSharpSymbolFormatter.FormatType(enumType) + "." + named.Name
+            .FirstOrDefault(member => member.HasConstantValue && Equals(member.ConstantValue, value));
+        return field is not null
+            ? CSharpSymbolFormatter.FormatType(enumType) + "." + field.Name
             : "(" + CSharpSymbolFormatter.FormatType(enumType) + ")" + Convert.ToString(value, CultureInfo.InvariantCulture);
     }
 
@@ -87,5 +87,5 @@ internal static class CSharpDefaultValueFormatter
     };
 
     private static bool IsNonNullableValueType(ITypeSymbol type) =>
-        type is { IsValueType: true, OriginalDefinition.SpecialType: not SpecialType.System_Nullable_T };
+        type.IsValueType && type.OriginalDefinition.SpecialType is not SpecialType.System_Nullable_T;
 }

@@ -7,7 +7,8 @@ public sealed class InstrumentedDatabaseGenerator : IIncrementalGenerator
     {
         context.RegisterSourceOutput(context.CompilationProvider, static (productionContext, compilation) =>
         {
-            if (compilation.GetTypeByMetadataName("StackExchange.Redis.IDatabase") is not { } databaseType)
+            var databaseType = compilation.GetTypeByMetadataName("StackExchange.Redis.IDatabase");
+            if (databaseType is null)
                 return;
 
             productionContext.AddSource("InstrumentedDatabase.g.cs", InstrumentedDatabaseSourceWriter.Write(databaseType));

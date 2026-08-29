@@ -15,12 +15,19 @@ internal static class CSharpSymbolFormatter
             ? "@" + name
             : name;
 
-    internal static void AppendRefKind(StringBuilder builder, RefKind refKind) =>
-        builder.Append(refKind switch
+    internal static void AppendRefKind(StringBuilder builder, RefKind refKind)
+    {
+        switch (refKind)
         {
-            RefKind.Ref => "ref ",
-            RefKind.Out => "out ",
-            RefKind.In => "in ",
-            _ => string.Empty,
-        });
+            case RefKind.Ref:
+                builder.Append("ref ");
+                return;
+            case RefKind.Out:
+                builder.Append("out ");
+                return;
+            case RefKind.In:
+                builder.Append("in ");
+                return;
+        }
+    }
 }

@@ -71,7 +71,7 @@ public sealed class InstrumentedDatabaseGeneratorTests
     private static string RunGenerator(string source)
     {
         var references = AppDomain.CurrentDomain.GetAssemblies()
-            .Where(assembly => assembly is { IsDynamic: false, Location: { Length: > 0 } })
+            .Where(assembly => !assembly.IsDynamic && assembly.Location.Length > 0)
             .Select(assembly => MetadataReference.CreateFromFile(assembly.Location));
 
         var compilation = CSharpCompilation.Create(
@@ -84,7 +84,7 @@ public sealed class InstrumentedDatabaseGeneratorTests
         GeneratorDriver driver = CSharpGeneratorDriver.Create(generator);
         driver = driver.RunGeneratorsAndUpdateCompilation(compilation, out _, out var diagnostics);
 
-        diagnostics.Where(diagnostic => diagnostic is { Severity: DiagnosticSeverity.Error }).ShouldBeEmpty();
+        diagnostics.Where(diagnostic => diagnostic.Severity is DiagnosticSeverity.Error).ShouldBeEmpty();
 
         var result = driver.GetRunResult();
         result.GeneratedTrees.Should().ContainSingle();

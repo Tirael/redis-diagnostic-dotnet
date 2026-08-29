@@ -26,10 +26,10 @@ internal static class DispatchProxyDefaults
 {
     public static object? GetDefault(Type type) => type switch
     {
-        var t when t == typeof(void) => null,
-        var t when t == typeof(Task) => Task.CompletedTask,
-        { IsGenericType: true } t when t.GetGenericTypeDefinition() == typeof(Task<>) => FromResult(t),
-        { IsValueType: true } => Activator.CreateInstance(type),
+        _ when type == typeof(void) => null,
+        _ when type == typeof(Task) => Task.CompletedTask,
+        _ when type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Task<>) => FromResult(type),
+        _ when type.IsValueType => Activator.CreateInstance(type),
         _ => null,
     };
 
