@@ -30,6 +30,9 @@ dotnet_naming_style.underscore_camel.capitalization = camel_case
 
 dotnet_diagnostic.CA1820.severity = suggestion
 dotnet_diagnostic.CA2007.severity = none
+dotnet_diagnostic.S1541.severity = error
+dotnet_diagnostic.S3776.severity = error
+dotnet_diagnostic.CA1502.severity = error
 csharp_style_pattern_matching_over_is_with_cast_check = true:suggestion
 csharp_style_pattern_matching_over_as_with_null_check = true:suggestion
 csharp_style_var_for_built_in_types = false:silent

@@ -1,42 +1,51 @@
-using System.Collections.Generic;
-using System.Text;
-using Microsoft.CodeAnalysis;
-
 namespace RedisDiagnostic.SourceGenerator;
 
 internal static class DatabaseInterfaceMembers
 {
     internal static IEnumerable<ISymbol> Enumerate(INamedTypeSymbol databaseType)
     {
-        foreach (var member in databaseType.GetMembers())
+        foreach (var member in EnumerateInstanceMembers(databaseType))
         {
-            if (!member.IsStatic)
-            {
-                yield return member;
-            }
+            yield return member;
         }
 
         foreach (var iface in databaseType.AllInterfaces)
         {
-            foreach (var member in iface.GetMembers())
+            foreach (var member in EnumerateInstanceMembers(iface))
             {
-                if (!member.IsStatic)
-                {
-                    yield return member;
-                }
+                yield return member;
             }
         }
     }
 
     internal static string GetSignatureKey(IMethodSymbol method)
     {
-        var builder = new StringBuilder();
+        StringBuilder builder = new();
         builder.Append("M:").Append(method.Name);
-        if (method.TypeParameters.Length > 0)
+        if (method.TypeParameters.Length is not 0)
         {
             builder.Append('`').Append(method.TypeParameters.Length);
         }
 
+        AppendParameterTypes(builder, method);
+        return builder.ToString();
+    }
+
+    private static IEnumerable<ISymbol> EnumerateInstanceMembers(INamedTypeSymbol type)
+    {
+        foreach (var member in type.GetMembers())
+        {
+            if (member.IsStatic)
+            {
+                continue;
+            }
+
+            yield return member;
+        }
+    }
+
+    private static void AppendParameterTypes(StringBuilder builder, IMethodSymbol method)
+    {
         builder.Append('(');
         for (var i = 0; i < method.Parameters.Length; i++)
         {
@@ -51,6 +60,5 @@ internal static class DatabaseInterfaceMembers
         }
 
         builder.Append(')');
-        return builder.ToString();
     }
 }

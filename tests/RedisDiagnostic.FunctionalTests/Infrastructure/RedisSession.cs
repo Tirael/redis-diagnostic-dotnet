@@ -1,5 +1,3 @@
-using Prometheus;
-
 namespace RedisDiagnostic.FunctionalTests.Infrastructure;
 
 public sealed class RedisSession
@@ -8,58 +6,30 @@ public sealed class RedisSession
     {
         Database = database;
         Raw = raw;
-        Registry = registry;
+        Histogram = new(registry);
     }
 
     public IDatabase Database { get; }
 
     public IDatabase Raw { get; }
 
-    public CollectorRegistry Registry { get; }
+    public RedisDurationHistogram Histogram { get; }
 
     public void InvokeAndObserve(string methodName, Action action)
     {
         try
         {
             action();
-            AssertObserved(methodName);
+            Histogram.AssertObserved(methodName);
         }
         catch (RedisServerException)
         {
-            AssertObserved(methodName, PrometheusRedisMethodMetrics.ResultError);
+            Histogram.AssertObserved(methodName, PrometheusRedisMethodMetrics.ResultError);
         }
     }
 
-    public void AssertObserved(string methodName, string result = PrometheusRedisMethodMetrics.ResultOk)
-    {
-        var histogram = Metrics
-            .WithCustomRegistry(Registry)
-            .CreateHistogram(
-                PrometheusRedisMethodMetrics.MetricName,
-                PrometheusRedisMethodMetrics.MetricHelp,
-                new HistogramConfiguration
-                {
-                    LabelNames = [PrometheusRedisMethodMetrics.LabelMethod, PrometheusRedisMethodMetrics.LabelResult],
-                });
+    public void AssertObserved(string methodName, string result = PrometheusRedisMethodMetrics.ResultOk) =>
+        Histogram.AssertObserved(methodName, result);
 
-        Assert.True(
-            histogram.WithLabels(methodName, result).Count >= 1,
-            $"Expected a histogram observation for method={methodName}, result={result}.");
-    }
-
-    public void AssertNotObserved(string methodName)
-    {
-        var histogram = Metrics
-            .WithCustomRegistry(Registry)
-            .CreateHistogram(
-                PrometheusRedisMethodMetrics.MetricName,
-                PrometheusRedisMethodMetrics.MetricHelp,
-                new HistogramConfiguration
-                {
-                    LabelNames = [PrometheusRedisMethodMetrics.LabelMethod, PrometheusRedisMethodMetrics.LabelResult],
-                });
-
-        Assert.Equal(0, histogram.WithLabels(methodName, PrometheusRedisMethodMetrics.ResultOk).Count);
-        Assert.Equal(0, histogram.WithLabels(methodName, PrometheusRedisMethodMetrics.ResultError).Count);
-    }
+    public void AssertNotObserved(string methodName) => Histogram.AssertNotObserved(methodName);
 }

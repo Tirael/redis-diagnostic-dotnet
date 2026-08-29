@@ -1,6 +1,3 @@
-using RedisDiagnostic.FunctionalTests.Infrastructure;
-using StackExchange.Redis;
-
 #pragma warning disable SER308 // These tests intentionally exercise the blocking Wait APIs.
 
 namespace RedisDiagnostic.FunctionalTests.Methods;
@@ -18,12 +15,11 @@ public sealed class ConnectionTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
 
         // Act / Assert
         var batch = session.Database.CreateBatch();
 
-        Assert.NotNull(batch);
+        batch.ShouldNotBeNull();
         session.AssertNotObserved(nameof(IDatabase.CreateBatch));
     }
 
@@ -33,12 +29,11 @@ public sealed class ConnectionTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
 
         // Act / Assert
         var transaction = session.Database.CreateTransaction();
 
-        Assert.NotNull(transaction);
+        transaction.ShouldNotBeNull();
         session.AssertNotObserved(nameof(IDatabase.CreateTransaction));
     }
 
@@ -48,11 +43,11 @@ public sealed class ConnectionTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         var connected = session.Database.IsConnected(key);
-        Assert.True(connected);
+        connected.ShouldBeTrue();
         session.AssertObserved(nameof(IDatabase.IsConnected));
     }
 
@@ -62,11 +57,10 @@ public sealed class ConnectionTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
 
         // Act / Assert
         var endpoint = session.Database.IdentifyEndpoint();
-        Assert.NotNull(endpoint);
+        endpoint.ShouldNotBeNull();
         session.AssertObserved(nameof(IDatabase.IdentifyEndpoint));
     }
 
@@ -76,11 +70,10 @@ public sealed class ConnectionTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
 
         // Act / Assert
         var endpoint = await session.Database.IdentifyEndpointAsync();
-        Assert.NotNull(endpoint);
+        endpoint.ShouldNotBeNull();
         session.AssertObserved(nameof(IDatabase.IdentifyEndpointAsync));
     }
 
@@ -90,11 +83,10 @@ public sealed class ConnectionTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
 
         // Act / Assert
         var latency = session.Database.Ping();
-        Assert.True(latency >= TimeSpan.Zero);
+        latency.ShouldBeGreaterThanOrEqualTo(TimeSpan.Zero);
         session.AssertObserved(nameof(IDatabase.Ping));
     }
 
@@ -104,11 +96,10 @@ public sealed class ConnectionTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
 
         // Act / Assert
         var latency = await session.Database.PingAsync();
-        Assert.True(latency >= TimeSpan.Zero);
+        latency.ShouldBeGreaterThanOrEqualTo(TimeSpan.Zero);
         session.AssertObserved(nameof(IDatabase.PingAsync));
     }
 
@@ -118,11 +109,10 @@ public sealed class ConnectionTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
 
         // Act / Assert
         var completed = session.Database.TryWait(Task.CompletedTask);
-        Assert.True(completed);
+        completed.ShouldBeTrue();
         session.AssertObserved(nameof(IDatabase.TryWait));
     }
 
@@ -132,11 +122,9 @@ public sealed class ConnectionTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
 
         // Act / Assert
         session.Database.Wait(Task.CompletedTask);
-        Assert.True(true);
         session.AssertObserved(nameof(IDatabase.Wait));
     }
 
@@ -146,11 +134,9 @@ public sealed class ConnectionTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
 
         // Act / Assert
         session.Database.WaitAll(Task.CompletedTask);
-        Assert.True(true);
         session.AssertObserved(nameof(IDatabase.WaitAll));
     }
 
@@ -160,11 +146,10 @@ public sealed class ConnectionTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
 
         // Act / Assert
-        var receivers = session.Database.Publish(RedisChannel.Literal(Fixture.NewKey("ch")), "m");
-        Assert.True(receivers >= 0);
+        var receivers = session.Database.Publish(RedisChannel.Literal(NewKey("ch")), "m");
+        receivers.ShouldBeGreaterThanOrEqualTo(0);
         session.AssertObserved(nameof(IDatabase.Publish));
     }
 
@@ -174,11 +159,10 @@ public sealed class ConnectionTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
 
         // Act / Assert
-        var receivers = await session.Database.PublishAsync(RedisChannel.Literal(Fixture.NewKey("ch")), "m");
-        Assert.True(receivers >= 0);
+        var receivers = await session.Database.PublishAsync(RedisChannel.Literal(NewKey("ch")), "m");
+        receivers.ShouldBeGreaterThanOrEqualTo(0);
         session.AssertObserved(nameof(IDatabase.PublishAsync));
     }
 
@@ -188,11 +172,10 @@ public sealed class ConnectionTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
 
         // Act / Assert
         var result = session.Database.Execute("PING");
-        Assert.Equal("PONG", result.ToString());
+        result.ToString().ShouldBe("PONG");
         session.AssertObserved(nameof(IDatabase.Execute));
     }
 
@@ -202,11 +185,10 @@ public sealed class ConnectionTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
 
         // Act / Assert
         var result = await session.Database.ExecuteAsync("PING");
-        Assert.Equal("PONG", result.ToString());
+        result.ToString().ShouldBe("PONG");
         session.AssertObserved(nameof(IDatabase.ExecuteAsync));
     }
 
@@ -216,12 +198,12 @@ public sealed class ConnectionTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.StringSet(key, "v");
         var debug = session.Database.DebugObject(key);
-        Assert.False(string.IsNullOrWhiteSpace(debug.ToString()));
+        debug.ToString().ShouldNotBeNullOrWhiteSpace();
         session.AssertObserved(nameof(IDatabase.DebugObject));
     }
 
@@ -231,12 +213,12 @@ public sealed class ConnectionTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.StringSet(key, "v");
         var debug = await session.Database.DebugObjectAsync(key);
-        Assert.False(string.IsNullOrWhiteSpace(debug.ToString()));
+        debug.ToString().ShouldNotBeNullOrWhiteSpace();
         session.AssertObserved(nameof(IDatabase.DebugObjectAsync));
     }
 }

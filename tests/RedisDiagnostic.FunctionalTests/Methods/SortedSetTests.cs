@@ -1,6 +1,3 @@
-using RedisDiagnostic.FunctionalTests.Infrastructure;
-using StackExchange.Redis;
-
 namespace RedisDiagnostic.FunctionalTests.Methods;
 
 [Collection(RedisCollection.Name)]
@@ -16,11 +13,11 @@ public sealed class SortedSetTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         var added = session.Database.SortedSetAdd(key, "a", 1);
-        Assert.True(added);
+        added.ShouldBeTrue();
         session.AssertObserved(nameof(IDatabase.SortedSetAdd));
     }
 
@@ -30,11 +27,11 @@ public sealed class SortedSetTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         var added = await session.Database.SortedSetAddAsync(key, "a", 1);
-        Assert.True(added);
+        added.ShouldBeTrue();
         session.AssertObserved(nameof(IDatabase.SortedSetAddAsync));
     }
 
@@ -44,12 +41,12 @@ public sealed class SortedSetTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.SortedSetAdd(key, "a", 1);
         var removed = session.Database.SortedSetRemove(key, "a");
-        Assert.True(removed);
+        removed.ShouldBeTrue();
         session.AssertObserved(nameof(IDatabase.SortedSetRemove));
     }
 
@@ -59,12 +56,12 @@ public sealed class SortedSetTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.SortedSetAdd(key, "a", 1);
         var removed = await session.Database.SortedSetRemoveAsync(key, "a");
-        Assert.True(removed);
+        removed.ShouldBeTrue();
         session.AssertObserved(nameof(IDatabase.SortedSetRemoveAsync));
     }
 
@@ -74,12 +71,12 @@ public sealed class SortedSetTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.SortedSetAdd(key, "a", 1.5);
         var score = session.Database.SortedSetScore(key, "a");
-        Assert.Equal(1.5, score);
+        score.ShouldBe(1.5);
         session.AssertObserved(nameof(IDatabase.SortedSetScore));
     }
 
@@ -89,12 +86,12 @@ public sealed class SortedSetTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.SortedSetAdd(key, "a", 1.5);
         var score = await session.Database.SortedSetScoreAsync(key, "a");
-        Assert.Equal(1.5, score);
+        score.ShouldBe(1.5);
         session.AssertObserved(nameof(IDatabase.SortedSetScoreAsync));
     }
 
@@ -104,12 +101,12 @@ public sealed class SortedSetTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.SortedSetAdd(key, "a", 1.5);
         var scores = session.Database.SortedSetScores(key, ["a"]);
-        Assert.Equal(1.5, scores[0]);
+        scores[0].ShouldBe(1.5);
         session.AssertObserved(nameof(IDatabase.SortedSetScores));
     }
 
@@ -119,12 +116,12 @@ public sealed class SortedSetTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.SortedSetAdd(key, "a", 1.5);
         var scores = await session.Database.SortedSetScoresAsync(key, ["a"]);
-        Assert.Equal(1.5, scores[0]);
+        scores[0].ShouldBe(1.5);
         session.AssertObserved(nameof(IDatabase.SortedSetScoresAsync));
     }
 
@@ -134,12 +131,12 @@ public sealed class SortedSetTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.SortedSetAdd(key, "a", 1);
         var rank = session.Database.SortedSetRank(key, "a");
-        Assert.Equal(0, rank);
+        rank.ShouldBe(0);
         session.AssertObserved(nameof(IDatabase.SortedSetRank));
     }
 
@@ -149,12 +146,12 @@ public sealed class SortedSetTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.SortedSetAdd(key, "a", 1);
         var rank = await session.Database.SortedSetRankAsync(key, "a");
-        Assert.Equal(0, rank);
+        rank.ShouldBe(0);
         session.AssertObserved(nameof(IDatabase.SortedSetRankAsync));
     }
 
@@ -164,12 +161,12 @@ public sealed class SortedSetTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.SortedSetAdd(key, "a", 1);
         var length = session.Database.SortedSetLength(key);
-        Assert.Equal(1, length);
+        length.ShouldBe(1);
         session.AssertObserved(nameof(IDatabase.SortedSetLength));
     }
 
@@ -179,12 +176,12 @@ public sealed class SortedSetTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.SortedSetAdd(key, "a", 1);
         var length = await session.Database.SortedSetLengthAsync(key);
-        Assert.Equal(1, length);
+        length.ShouldBe(1);
         session.AssertObserved(nameof(IDatabase.SortedSetLengthAsync));
     }
 
@@ -194,12 +191,12 @@ public sealed class SortedSetTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.SortedSetAdd(key, "a", 1);
         var length = session.Database.SortedSetLengthByValue(key, "a", "a");
-        Assert.Equal(1, length);
+        length.ShouldBe(1);
         session.AssertObserved(nameof(IDatabase.SortedSetLengthByValue));
     }
 
@@ -209,12 +206,12 @@ public sealed class SortedSetTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.SortedSetAdd(key, "a", 1);
         var length = await session.Database.SortedSetLengthByValueAsync(key, "a", "a");
-        Assert.Equal(1, length);
+        length.ShouldBe(1);
         session.AssertObserved(nameof(IDatabase.SortedSetLengthByValueAsync));
     }
 
@@ -224,11 +221,11 @@ public sealed class SortedSetTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         var score = session.Database.SortedSetIncrement(key, "a", 2);
-        Assert.Equal(2, score);
+        score.ShouldBe(2);
         session.AssertObserved(nameof(IDatabase.SortedSetIncrement));
     }
 
@@ -238,11 +235,11 @@ public sealed class SortedSetTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         var score = await session.Database.SortedSetIncrementAsync(key, "a", 2);
-        Assert.Equal(2, score);
+        score.ShouldBe(2);
         session.AssertObserved(nameof(IDatabase.SortedSetIncrementAsync));
     }
 
@@ -252,12 +249,12 @@ public sealed class SortedSetTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.SortedSetAdd(key, "a", 5);
         var score = session.Database.SortedSetDecrement(key, "a", 2);
-        Assert.Equal(3, score);
+        score.ShouldBe(3);
         session.AssertObserved(nameof(IDatabase.SortedSetDecrement));
     }
 
@@ -267,12 +264,12 @@ public sealed class SortedSetTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.SortedSetAdd(key, "a", 5);
         var score = await session.Database.SortedSetDecrementAsync(key, "a", 2);
-        Assert.Equal(3, score);
+        score.ShouldBe(3);
         session.AssertObserved(nameof(IDatabase.SortedSetDecrementAsync));
     }
 
@@ -282,13 +279,13 @@ public sealed class SortedSetTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.SortedSetAdd(key, "a", 1);
         var updated = session.Database.SortedSetUpdate(key, "a", 9);
-        Assert.True(updated);
-        Assert.Equal(9, session.Raw.SortedSetScore(key, "a"));
+        updated.ShouldBeTrue();
+        session.Raw.SortedSetScore(key, "a").ShouldBe(9);
         session.AssertObserved(nameof(IDatabase.SortedSetUpdate));
     }
 
@@ -298,12 +295,12 @@ public sealed class SortedSetTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.SortedSetAdd(key, "a", 1);
         var updated = await session.Database.SortedSetUpdateAsync(key, "a", 9);
-        Assert.True(updated);
+        updated.ShouldBeTrue();
         session.AssertObserved(nameof(IDatabase.SortedSetUpdateAsync));
     }
 
@@ -313,12 +310,12 @@ public sealed class SortedSetTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.SortedSetAdd(key, "a", 1);
         var entry = session.Database.SortedSetPop(key);
-        Assert.Equal("a", (string?)entry!.Value.Element);
+        ((string?)entry!.Value.Element).ShouldBe("a");
         session.AssertObserved(nameof(IDatabase.SortedSetPop));
     }
 
@@ -328,12 +325,12 @@ public sealed class SortedSetTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.SortedSetAdd(key, "a", 1);
         var entry = await session.Database.SortedSetPopAsync(key);
-        Assert.Equal("a", (string?)entry!.Value.Element);
+        ((string?)entry!.Value.Element).ShouldBe("a");
         session.AssertObserved(nameof(IDatabase.SortedSetPopAsync));
     }
 
@@ -343,12 +340,12 @@ public sealed class SortedSetTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.SortedSetAdd(key, "a", 1);
         var member = session.Database.SortedSetRandomMember(key);
-        Assert.Equal("a", (string?)member);
+        ((string?)member).ShouldBe("a");
         session.AssertObserved(nameof(IDatabase.SortedSetRandomMember));
     }
 
@@ -358,12 +355,12 @@ public sealed class SortedSetTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.SortedSetAdd(key, "a", 1);
         var member = await session.Database.SortedSetRandomMemberAsync(key);
-        Assert.Equal("a", (string?)member);
+        ((string?)member).ShouldBe("a");
         session.AssertObserved(nameof(IDatabase.SortedSetRandomMemberAsync));
     }
 
@@ -373,12 +370,12 @@ public sealed class SortedSetTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.SortedSetAdd(key, "a", 1);
         var members = session.Database.SortedSetRandomMembers(key, 1);
-        Assert.Single(members);
+        members.Should().ContainSingle();
         session.AssertObserved(nameof(IDatabase.SortedSetRandomMembers));
     }
 
@@ -388,12 +385,12 @@ public sealed class SortedSetTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.SortedSetAdd(key, "a", 1);
         var members = await session.Database.SortedSetRandomMembersAsync(key, 1);
-        Assert.Single(members);
+        members.Should().ContainSingle();
         session.AssertObserved(nameof(IDatabase.SortedSetRandomMembersAsync));
     }
 
@@ -403,12 +400,12 @@ public sealed class SortedSetTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.SortedSetAdd(key, "a", 1);
         var entries = session.Database.SortedSetRandomMembersWithScores(key, 1);
-        Assert.Single(entries);
+        entries.Should().ContainSingle();
         session.AssertObserved(nameof(IDatabase.SortedSetRandomMembersWithScores));
     }
 
@@ -418,12 +415,12 @@ public sealed class SortedSetTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.SortedSetAdd(key, "a", 1);
         var entries = await session.Database.SortedSetRandomMembersWithScoresAsync(key, 1);
-        Assert.Single(entries);
+        entries.Should().ContainSingle();
         session.AssertObserved(nameof(IDatabase.SortedSetRandomMembersWithScoresAsync));
     }
 
@@ -433,12 +430,12 @@ public sealed class SortedSetTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.SortedSetAdd(key, "a", 1);
         var values = session.Database.SortedSetRangeByRank(key);
-        Assert.Equal("a", (string?)values[0]);
+        ((string?)values[0]).ShouldBe("a");
         session.AssertObserved(nameof(IDatabase.SortedSetRangeByRank));
     }
 
@@ -448,12 +445,12 @@ public sealed class SortedSetTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.SortedSetAdd(key, "a", 1);
         var values = await session.Database.SortedSetRangeByRankAsync(key);
-        Assert.Equal("a", (string?)values[0]);
+        ((string?)values[0]).ShouldBe("a");
         session.AssertObserved(nameof(IDatabase.SortedSetRangeByRankAsync));
     }
 
@@ -463,12 +460,12 @@ public sealed class SortedSetTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.SortedSetAdd(key, "a", 1);
         var values = session.Database.SortedSetRangeByRankWithScores(key);
-        Assert.Equal("a", (string?)values[0].Element);
+        ((string?)values[0].Element).ShouldBe("a");
         session.AssertObserved(nameof(IDatabase.SortedSetRangeByRankWithScores));
     }
 
@@ -478,12 +475,12 @@ public sealed class SortedSetTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.SortedSetAdd(key, "a", 1);
         var values = await session.Database.SortedSetRangeByRankWithScoresAsync(key);
-        Assert.Equal("a", (string?)values[0].Element);
+        ((string?)values[0].Element).ShouldBe("a");
         session.AssertObserved(nameof(IDatabase.SortedSetRangeByRankWithScoresAsync));
     }
 
@@ -493,12 +490,12 @@ public sealed class SortedSetTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.SortedSetAdd(key, "a", 1);
         var values = session.Database.SortedSetRangeByScore(key, 0, 2);
-        Assert.Equal("a", (string?)values[0]);
+        ((string?)values[0]).ShouldBe("a");
         session.AssertObserved(nameof(IDatabase.SortedSetRangeByScore));
     }
 
@@ -508,12 +505,12 @@ public sealed class SortedSetTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.SortedSetAdd(key, "a", 1);
         var values = await session.Database.SortedSetRangeByScoreAsync(key, 0, 2);
-        Assert.Equal("a", (string?)values[0]);
+        ((string?)values[0]).ShouldBe("a");
         session.AssertObserved(nameof(IDatabase.SortedSetRangeByScoreAsync));
     }
 
@@ -523,12 +520,12 @@ public sealed class SortedSetTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.SortedSetAdd(key, "a", 1);
         var values = session.Database.SortedSetRangeByScoreWithScores(key, 0, 2);
-        Assert.Equal("a", (string?)values[0].Element);
+        ((string?)values[0].Element).ShouldBe("a");
         session.AssertObserved(nameof(IDatabase.SortedSetRangeByScoreWithScores));
     }
 
@@ -538,12 +535,12 @@ public sealed class SortedSetTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.SortedSetAdd(key, "a", 1);
         var values = await session.Database.SortedSetRangeByScoreWithScoresAsync(key, 0, 2);
-        Assert.Equal("a", (string?)values[0].Element);
+        ((string?)values[0].Element).ShouldBe("a");
         session.AssertObserved(nameof(IDatabase.SortedSetRangeByScoreWithScoresAsync));
     }
 
@@ -553,12 +550,12 @@ public sealed class SortedSetTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.SortedSetAdd(key, "a", 1);
         var values = session.Database.SortedSetRangeByValue(key, "a", "a");
-        Assert.Equal("a", (string?)values[0]);
+        ((string?)values[0]).ShouldBe("a");
         session.AssertObserved(nameof(IDatabase.SortedSetRangeByValue));
     }
 
@@ -568,12 +565,12 @@ public sealed class SortedSetTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.SortedSetAdd(key, "a", 1);
         var values = await session.Database.SortedSetRangeByValueAsync(key, "a", "a");
-        Assert.Equal("a", (string?)values[0]);
+        ((string?)values[0]).ShouldBe("a");
         session.AssertObserved(nameof(IDatabase.SortedSetRangeByValueAsync));
     }
 
@@ -583,13 +580,13 @@ public sealed class SortedSetTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
-        var dest = Fixture.NewKey("zd");
+        var dest = NewKey("zd");
         session.Raw.SortedSetAdd(key, "a", 1);
         var length = session.Database.SortedSetRangeAndStore(key, dest, 0, 0);
-        Assert.Equal(1, length);
+        length.ShouldBe(1);
         session.AssertObserved(nameof(IDatabase.SortedSetRangeAndStore));
     }
 
@@ -599,13 +596,13 @@ public sealed class SortedSetTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
-        var dest = Fixture.NewKey("zd");
+        var dest = NewKey("zd");
         session.Raw.SortedSetAdd(key, "a", 1);
         var length = await session.Database.SortedSetRangeAndStoreAsync(key, dest, 0, 0);
-        Assert.Equal(1, length);
+        length.ShouldBe(1);
         session.AssertObserved(nameof(IDatabase.SortedSetRangeAndStoreAsync));
     }
 
@@ -615,12 +612,12 @@ public sealed class SortedSetTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.SortedSetAdd(key, [new SortedSetEntry("a", 1), new SortedSetEntry("b", 2)]);
         var removed = session.Database.SortedSetRemoveRangeByRank(key, 0, 0);
-        Assert.Equal(1, removed);
+        removed.ShouldBe(1);
         session.AssertObserved(nameof(IDatabase.SortedSetRemoveRangeByRank));
     }
 
@@ -630,12 +627,12 @@ public sealed class SortedSetTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.SortedSetAdd(key, [new SortedSetEntry("a", 1), new SortedSetEntry("b", 2)]);
         var removed = await session.Database.SortedSetRemoveRangeByRankAsync(key, 0, 0);
-        Assert.Equal(1, removed);
+        removed.ShouldBe(1);
         session.AssertObserved(nameof(IDatabase.SortedSetRemoveRangeByRankAsync));
     }
 
@@ -645,12 +642,12 @@ public sealed class SortedSetTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.SortedSetAdd(key, "a", 1);
         var removed = session.Database.SortedSetRemoveRangeByScore(key, 0, 2);
-        Assert.Equal(1, removed);
+        removed.ShouldBe(1);
         session.AssertObserved(nameof(IDatabase.SortedSetRemoveRangeByScore));
     }
 
@@ -660,12 +657,12 @@ public sealed class SortedSetTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.SortedSetAdd(key, "a", 1);
         var removed = await session.Database.SortedSetRemoveRangeByScoreAsync(key, 0, 2);
-        Assert.Equal(1, removed);
+        removed.ShouldBe(1);
         session.AssertObserved(nameof(IDatabase.SortedSetRemoveRangeByScoreAsync));
     }
 
@@ -675,12 +672,12 @@ public sealed class SortedSetTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.SortedSetAdd(key, "a", 1);
         var removed = session.Database.SortedSetRemoveRangeByValue(key, "a", "a");
-        Assert.Equal(1, removed);
+        removed.ShouldBe(1);
         session.AssertObserved(nameof(IDatabase.SortedSetRemoveRangeByValue));
     }
 
@@ -690,12 +687,12 @@ public sealed class SortedSetTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.SortedSetAdd(key, "a", 1);
         var removed = await session.Database.SortedSetRemoveRangeByValueAsync(key, "a", "a");
-        Assert.Equal(1, removed);
+        removed.ShouldBe(1);
         session.AssertObserved(nameof(IDatabase.SortedSetRemoveRangeByValueAsync));
     }
 
@@ -705,14 +702,14 @@ public sealed class SortedSetTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
-        var other = Fixture.NewKey("z2");
+        var other = NewKey("z2");
         session.Raw.SortedSetAdd(key, "a", 1);
         session.Raw.SortedSetAdd(other, "b", 2);
         var values = session.Database.SortedSetCombine(SetOperation.Union, [key, other]);
-        Assert.Equal(2, values.Length);
+        values.Length.ShouldBe(2);
         session.AssertObserved(nameof(IDatabase.SortedSetCombine));
     }
 
@@ -722,14 +719,14 @@ public sealed class SortedSetTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
-        var other = Fixture.NewKey("z2");
+        var other = NewKey("z2");
         session.Raw.SortedSetAdd(key, "a", 1);
         session.Raw.SortedSetAdd(other, "b", 2);
         var values = await session.Database.SortedSetCombineAsync(SetOperation.Union, [key, other]);
-        Assert.Equal(2, values.Length);
+        values.Length.ShouldBe(2);
         session.AssertObserved(nameof(IDatabase.SortedSetCombineAsync));
     }
 
@@ -739,14 +736,14 @@ public sealed class SortedSetTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
-        var other = Fixture.NewKey("z2");
+        var other = NewKey("z2");
         session.Raw.SortedSetAdd(key, "a", 1);
         session.Raw.SortedSetAdd(other, "b", 2);
         var values = session.Database.SortedSetCombineWithScores(SetOperation.Union, [key, other]);
-        Assert.Equal(2, values.Length);
+        values.Length.ShouldBe(2);
         session.AssertObserved(nameof(IDatabase.SortedSetCombineWithScores));
     }
 
@@ -756,14 +753,14 @@ public sealed class SortedSetTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
-        var other = Fixture.NewKey("z2");
+        var other = NewKey("z2");
         session.Raw.SortedSetAdd(key, "a", 1);
         session.Raw.SortedSetAdd(other, "b", 2);
         var values = await session.Database.SortedSetCombineWithScoresAsync(SetOperation.Union, [key, other]);
-        Assert.Equal(2, values.Length);
+        values.Length.ShouldBe(2);
         session.AssertObserved(nameof(IDatabase.SortedSetCombineWithScoresAsync));
     }
 
@@ -773,15 +770,15 @@ public sealed class SortedSetTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
-        var other = Fixture.NewKey("z2");
-        var dest = Fixture.NewKey("zd");
+        var other = NewKey("z2");
+        var dest = NewKey("zd");
         session.Raw.SortedSetAdd(key, "a", 1);
         session.Raw.SortedSetAdd(other, "b", 2);
         var length = session.Database.SortedSetCombineAndStore(SetOperation.Union, dest, key, other);
-        Assert.Equal(2, length);
+        length.ShouldBe(2);
         session.AssertObserved(nameof(IDatabase.SortedSetCombineAndStore));
     }
 
@@ -791,15 +788,15 @@ public sealed class SortedSetTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
-        var other = Fixture.NewKey("z2");
-        var dest = Fixture.NewKey("zd");
+        var other = NewKey("z2");
+        var dest = NewKey("zd");
         session.Raw.SortedSetAdd(key, "a", 1);
         session.Raw.SortedSetAdd(other, "b", 2);
         var length = await session.Database.SortedSetCombineAndStoreAsync(SetOperation.Union, dest, key, other);
-        Assert.Equal(2, length);
+        length.ShouldBe(2);
         session.AssertObserved(nameof(IDatabase.SortedSetCombineAndStoreAsync));
     }
 
@@ -809,14 +806,14 @@ public sealed class SortedSetTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
-        var other = Fixture.NewKey("z2");
+        var other = NewKey("z2");
         session.Raw.SortedSetAdd(key, "a", 1);
         session.Raw.SortedSetAdd(other, "a", 2);
         var length = session.Database.SortedSetIntersectionLength([key, other]);
-        Assert.Equal(1, length);
+        length.ShouldBe(1);
         session.AssertObserved(nameof(IDatabase.SortedSetIntersectionLength));
     }
 
@@ -826,14 +823,14 @@ public sealed class SortedSetTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
-        var other = Fixture.NewKey("z2");
+        var other = NewKey("z2");
         session.Raw.SortedSetAdd(key, "a", 1);
         session.Raw.SortedSetAdd(other, "a", 2);
         var length = await session.Database.SortedSetIntersectionLengthAsync([key, other]);
-        Assert.Equal(1, length);
+        length.ShouldBe(1);
         session.AssertObserved(nameof(IDatabase.SortedSetIntersectionLengthAsync));
     }
 
@@ -843,12 +840,12 @@ public sealed class SortedSetTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.SortedSetAdd(key, "a", 1);
         var values = session.Database.SortedSetScan(key).ToArray();
-        Assert.Equal("a", (string?)values[0].Element);
+        ((string?)values[0].Element).ShouldBe("a");
         session.AssertObserved(nameof(IDatabase.SortedSetScan));
     }
 
@@ -858,16 +855,16 @@ public sealed class SortedSetTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.SortedSetAdd(key, "a", 1);
-        var values = new List<SortedSetEntry>();
+        List<SortedSetEntry> values = new();
         await foreach (var value in session.Database.SortedSetScanAsync(key))
         {
             values.Add(value);
         }
-        Assert.Equal("a", (string?)values[0].Element);
+        ((string?)values[0].Element).ShouldBe("a");
         session.AssertObserved(nameof(IDatabase.SortedSetScanAsync));
     }
 }

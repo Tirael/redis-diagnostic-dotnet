@@ -25,5 +25,8 @@
     <!-- Overrides high-severity CVE in System.Formats.Asn1 5.0.0 pulled by testing SDK 1.1.2 -->
     <PackageVersion Include="System.Formats.Asn1" Version="10.0.11" />
     <PackageVersion Include="Testcontainers.Redis" Version="4.14.0" />
+    <PackageVersion Include="Shouldly" Version="4.3.0" />
+    <PackageVersion Include="AwesomeAssertions" Version="9.6.0" />
+    <PackageVersion Include="SonarAnalyzer.CSharp" Version="10.33.0.1635" />
   </ItemGroup>
 </Project>

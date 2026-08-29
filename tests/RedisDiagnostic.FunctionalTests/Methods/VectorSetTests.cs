@@ -1,6 +1,3 @@
-using RedisDiagnostic.FunctionalTests.Infrastructure;
-using StackExchange.Redis;
-
 namespace RedisDiagnostic.FunctionalTests.Methods;
 
 [Collection(RedisCollection.Name)]
@@ -15,7 +12,7 @@ public sealed class VectorSetTests : RedisTestBase
     public void Given_redis_When_VectorSetAdd_Then_state_and_metric_are_observed()
     {
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
         session.InvokeAndObserve(
             nameof(IDatabase.VectorSetAdd),
             () => session.Database.VectorSetAdd(key, VectorSetAddRequest.Member("m", new float[] { 1f, 0f })));
@@ -135,8 +132,9 @@ public sealed class VectorSetTests : RedisTestBase
             nameof(IDatabase.VectorSetRangeEnumerate),
             (database, key) =>
             {
-                foreach (var _ in database.VectorSetRangeEnumerate(key, "-", "+", 10))
+                foreach (var member in database.VectorSetRangeEnumerate(key, "-", "+", 10))
                 {
+                    _ = member;
                 }
             });
     }
@@ -144,13 +142,14 @@ public sealed class VectorSetTests : RedisTestBase
     private void InvokeAfterAdd(string methodName, Action<IDatabase, RedisKey> action)
     {
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
         try
         {
             session.Raw.VectorSetAdd(key, VectorSetAddRequest.Member("m", new float[] { 1f, 0f }));
         }
-        catch (RedisServerException)
+        catch (RedisServerException exception)
         {
+            _ = exception;
         }
 
         session.InvokeAndObserve(methodName, () => action(session.Database, key));

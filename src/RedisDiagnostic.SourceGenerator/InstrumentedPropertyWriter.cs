@@ -1,6 +1,3 @@
-using System.Text;
-using Microsoft.CodeAnalysis;
-
 namespace RedisDiagnostic.SourceGenerator;
 
 internal static class InstrumentedPropertyWriter

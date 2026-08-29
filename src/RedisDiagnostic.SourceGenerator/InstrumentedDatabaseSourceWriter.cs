@@ -1,18 +1,14 @@
-using System.Collections.Generic;
-using System.Text;
-using Microsoft.CodeAnalysis;
-
 namespace RedisDiagnostic.SourceGenerator;
 
 internal static class InstrumentedDatabaseSourceWriter
 {
     internal static string Write(INamedTypeSymbol databaseType)
     {
-        var builder = new StringBuilder(64 * 1024);
+        StringBuilder builder = new(64 * 1024);
         AppendClassHeader(builder);
 
-        var emitted = new Dictionary<string, IMethodSymbol>(StringComparer.Ordinal);
-        var emittedProperties = new HashSet<string>(StringComparer.Ordinal);
+        Dictionary<string, IMethodSymbol> emitted = new(StringComparer.Ordinal);
+        HashSet<string> emittedProperties = new(StringComparer.Ordinal);
         foreach (var member in DatabaseInterfaceMembers.Enumerate(databaseType))
         {
             if (member is IPropertySymbol property)
@@ -26,10 +22,12 @@ internal static class InstrumentedDatabaseSourceWriter
                 continue;
             }
 
-            if (member is IMethodSymbol method && method.MethodKind == MethodKind.Ordinary)
+            if (member is not IMethodSymbol { MethodKind: MethodKind.Ordinary } method)
             {
-                AppendUniqueMethod(builder, method, emitted);
+                continue;
             }
+
+            AppendUniqueMethod(builder, method, emitted);
         }
 
         builder.AppendLine("}");
@@ -65,17 +63,18 @@ internal static class InstrumentedDatabaseSourceWriter
         Dictionary<string, IMethodSymbol> emitted)
     {
         var key = DatabaseInterfaceMembers.GetSignatureKey(method);
-        if (emitted.TryGetValue(key, out var existing))
+        if (!emitted.TryGetValue(key, out var existing))
         {
-            if (!SymbolEqualityComparer.Default.Equals(existing.ReturnType, method.ReturnType))
-            {
-                InstrumentedMethodWriter.Write(builder, method, explicitInterface: true);
-            }
-
+            emitted[key] = method;
+            InstrumentedMethodWriter.Write(builder, method, explicitInterface: false);
             return;
         }
 
-        emitted[key] = method;
-        InstrumentedMethodWriter.Write(builder, method, explicitInterface: false);
+        if (SymbolEqualityComparer.Default.Equals(existing.ReturnType, method.ReturnType))
+        {
+            return;
+        }
+
+        InstrumentedMethodWriter.Write(builder, method, explicitInterface: true);
     }
 }

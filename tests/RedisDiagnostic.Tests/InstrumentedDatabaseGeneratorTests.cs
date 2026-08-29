@@ -1,9 +1,3 @@
-using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.CSharp.Testing;
-using Microsoft.CodeAnalysis.Testing;
-using RedisDiagnostic.SourceGenerator;
-
 namespace RedisDiagnostic.Tests;
 
 public sealed class InstrumentedDatabaseGeneratorTests
@@ -61,39 +55,39 @@ public sealed class InstrumentedDatabaseGeneratorTests
         await test.RunAsync();
 
         var generated = RunGenerator(source);
-        Assert.Contains("public sealed class InstrumentedDatabase : global::StackExchange.Redis.IDatabase", generated, StringComparison.Ordinal);
-        Assert.Contains("StringSet", generated, StringComparison.Ordinal);
-        Assert.Contains("StringGetAsync", generated, StringComparison.Ordinal);
-        Assert.Contains("KeyRestore", generated, StringComparison.Ordinal);
-        Assert.Contains("CreateBatch", generated, StringComparison.Ordinal);
-        Assert.Contains("CreateTransaction", generated, StringComparison.Ordinal);
-        Assert.Contains("Database", generated, StringComparison.Ordinal);
-        Assert.Contains("Multiplexer", generated, StringComparison.Ordinal);
-        Assert.Contains("_metrics.Measure(nameof(StringSet)", generated, StringComparison.Ordinal);
-        Assert.Contains("_metrics.MeasureAsync(nameof(StringGetAsync)", generated, StringComparison.Ordinal);
-        Assert.DoesNotContain("_metrics.Measure(nameof(CreateBatch)", generated, StringComparison.Ordinal);
+        generated.Should().Contain("public sealed class InstrumentedDatabase : global::StackExchange.Redis.IDatabase")
+            .And.Contain("StringSet")
+            .And.Contain("StringGetAsync")
+            .And.Contain("KeyRestore")
+            .And.Contain("CreateBatch")
+            .And.Contain("CreateTransaction")
+            .And.Contain("Database")
+            .And.Contain("Multiplexer")
+            .And.Contain("_metrics.Measure(nameof(StringSet)")
+            .And.Contain("_metrics.MeasureAsync(nameof(StringGetAsync)")
+            .And.NotContain("_metrics.Measure(nameof(CreateBatch)");
     }
 
     private static string RunGenerator(string source)
     {
         var references = AppDomain.CurrentDomain.GetAssemblies()
-            .Where(assembly => !assembly.IsDynamic && !string.IsNullOrEmpty(assembly.Location))
+            .Where(assembly => assembly is { IsDynamic: false, Location: { Length: > 0 } })
             .Select(assembly => MetadataReference.CreateFromFile(assembly.Location));
 
         var compilation = CSharpCompilation.Create(
             "generator-test",
             [CSharpSyntaxTree.ParseText(source)],
             references,
-            new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
+            new(OutputKind.DynamicallyLinkedLibrary));
 
-        var generator = new InstrumentedDatabaseGenerator();
+        InstrumentedDatabaseGenerator generator = new();
         GeneratorDriver driver = CSharpGeneratorDriver.Create(generator);
         driver = driver.RunGeneratorsAndUpdateCompilation(compilation, out _, out var diagnostics);
 
-        Assert.Empty(diagnostics.Where(d => d.Severity == DiagnosticSeverity.Error));
+        diagnostics.Where(diagnostic => diagnostic is { Severity: DiagnosticSeverity.Error }).ShouldBeEmpty();
 
         var result = driver.GetRunResult();
-        Assert.Single(result.GeneratedTrees);
+        result.GeneratedTrees.Should().ContainSingle();
         return result.GeneratedTrees[0].GetText().ToString();
     }
 }

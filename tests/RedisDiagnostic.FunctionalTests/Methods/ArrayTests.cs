@@ -1,6 +1,3 @@
-using RedisDiagnostic.FunctionalTests.Infrastructure;
-using StackExchange.Redis;
-
 namespace RedisDiagnostic.FunctionalTests.Methods;
 
 [Collection(RedisCollection.Name)]
@@ -15,7 +12,7 @@ public sealed class ArrayTests : RedisTestBase
     public void Given_redis_When_ArraySet_Then_state_and_metric_are_observed()
     {
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
         session.InvokeAndObserve(nameof(IDatabase.ArraySet), () => session.Database.ArraySet(key, 0, "v"));
     }
 
@@ -24,7 +21,7 @@ public sealed class ArrayTests : RedisTestBase
     public void Given_redis_When_ArrayGet_Then_state_and_metric_are_observed()
     {
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
         TryArraySet(session.Raw, key);
         session.InvokeAndObserve(nameof(IDatabase.ArrayGet), () => session.Database.ArrayGet(key, 0));
     }
@@ -34,7 +31,7 @@ public sealed class ArrayTests : RedisTestBase
     public void Given_redis_When_ArrayGetRange_Then_state_and_metric_are_observed()
     {
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
         TryArraySet(session.Raw, key);
         session.InvokeAndObserve(nameof(IDatabase.ArrayGetRange), () => session.Database.ArrayGetRange(key, 0, 0));
     }
@@ -44,7 +41,7 @@ public sealed class ArrayTests : RedisTestBase
     public void Given_redis_When_ArrayLength_Then_state_and_metric_are_observed()
     {
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
         TryArraySet(session.Raw, key);
         session.InvokeAndObserve(nameof(IDatabase.ArrayLength), () => session.Database.ArrayLength(key));
     }
@@ -54,7 +51,7 @@ public sealed class ArrayTests : RedisTestBase
     public void Given_redis_When_ArrayCount_Then_state_and_metric_are_observed()
     {
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
         TryArraySet(session.Raw, key);
         session.InvokeAndObserve(nameof(IDatabase.ArrayCount), () => session.Database.ArrayCount(key));
     }
@@ -64,7 +61,7 @@ public sealed class ArrayTests : RedisTestBase
     public void Given_redis_When_ArrayDelete_Then_state_and_metric_are_observed()
     {
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
         TryArraySet(session.Raw, key);
         session.InvokeAndObserve(nameof(IDatabase.ArrayDelete), () => session.Database.ArrayDelete(key, 0));
     }
@@ -74,7 +71,7 @@ public sealed class ArrayTests : RedisTestBase
     public void Given_redis_When_ArrayDeleteRange_Then_state_and_metric_are_observed()
     {
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
         TryArraySet(session.Raw, key);
         session.InvokeAndObserve(nameof(IDatabase.ArrayDeleteRange), () => session.Database.ArrayDeleteRange(key, 0, 0));
     }
@@ -84,7 +81,7 @@ public sealed class ArrayTests : RedisTestBase
     public void Given_redis_When_ArrayScan_Then_state_and_metric_are_observed()
     {
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
         TryArraySet(session.Raw, key);
         session.InvokeAndObserve(nameof(IDatabase.ArrayScan), () => session.Database.ArrayScan(key, 0, 0));
     }
@@ -94,9 +91,9 @@ public sealed class ArrayTests : RedisTestBase
     public void Given_redis_When_ArrayGrep_Then_state_and_metric_are_observed()
     {
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
         TryArraySet(session.Raw, key);
-        var request = new ArrayGrepRequest();
+        ArrayGrepRequest request = new();
         request.AddPredicate(ArrayGrepRequest.Predicate.Exact("v"));
         session.InvokeAndObserve(nameof(IDatabase.ArrayGrep), () => session.Database.ArrayGrep(key, request));
     }
@@ -106,7 +103,7 @@ public sealed class ArrayTests : RedisTestBase
     public void Given_redis_When_ArrayOperation_Then_state_and_metric_are_observed()
     {
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
         TryArraySet(session.Raw, key);
         session.InvokeAndObserve(
             nameof(IDatabase.ArrayOperation),
@@ -118,7 +115,7 @@ public sealed class ArrayTests : RedisTestBase
     public void Given_redis_When_ArrayRing_Then_state_and_metric_are_observed()
     {
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
         session.InvokeAndObserve(nameof(IDatabase.ArrayRing), () => session.Database.ArrayRing(key, 8, "v"));
     }
 
@@ -127,7 +124,7 @@ public sealed class ArrayTests : RedisTestBase
     public void Given_redis_When_ArrayNext_Then_state_and_metric_are_observed()
     {
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
         TryArraySet(session.Raw, key);
         session.InvokeAndObserve(nameof(IDatabase.ArrayNext), () => session.Database.ArrayNext(key));
     }
@@ -137,7 +134,7 @@ public sealed class ArrayTests : RedisTestBase
     public void Given_redis_When_ArrayInsert_Then_state_and_metric_are_observed()
     {
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
         session.InvokeAndObserve(nameof(IDatabase.ArrayInsert), () => session.Database.ArrayInsert(key, "v"));
     }
 
@@ -146,7 +143,7 @@ public sealed class ArrayTests : RedisTestBase
     public void Given_redis_When_ArraySeek_Then_state_and_metric_are_observed()
     {
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
         TryArraySet(session.Raw, key);
         session.InvokeAndObserve(nameof(IDatabase.ArraySeek), () => session.Database.ArraySeek(key, 1));
     }
@@ -156,7 +153,7 @@ public sealed class ArrayTests : RedisTestBase
     public void Given_redis_When_ArrayLastItems_Then_state_and_metric_are_observed()
     {
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
         TryArraySet(session.Raw, key);
         session.InvokeAndObserve(nameof(IDatabase.ArrayLastItems), () => session.Database.ArrayLastItems(key, 1));
     }
@@ -166,7 +163,7 @@ public sealed class ArrayTests : RedisTestBase
     public void Given_redis_When_ArrayInfo_Then_state_and_metric_are_observed()
     {
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
         TryArraySet(session.Raw, key);
         session.InvokeAndObserve(nameof(IDatabase.ArrayInfo), () => session.Database.ArrayInfo(key));
     }
@@ -177,8 +174,9 @@ public sealed class ArrayTests : RedisTestBase
         {
             database.ArraySet(key, 0, "v");
         }
-        catch (RedisServerException)
+        catch (RedisServerException exception)
         {
+            _ = exception;
         }
     }
 }

@@ -1,12 +1,8 @@
-using System.Collections.Generic;
-using System.Text;
-using Microsoft.CodeAnalysis;
-
 namespace RedisDiagnostic.SourceGenerator;
 
 internal static class InstrumentedMethodWriter
 {
-    private static readonly HashSet<string> s_passThroughMethods = new HashSet<string>(StringComparer.Ordinal)
+    private static readonly HashSet<string> s_passThroughMethods = new(StringComparer.Ordinal)
     {
         "CreateBatch",
         "CreateTransaction",
@@ -65,7 +61,7 @@ internal static class InstrumentedMethodWriter
     private static void AppendParameter(StringBuilder builder, IParameterSymbol parameter, bool includeDefault)
     {
         CSharpSymbolFormatter.AppendRefKind(builder, parameter.RefKind);
-        if (parameter.IsParams)
+        if (parameter is { IsParams: true })
         {
             builder.Append("params ");
         }
@@ -73,10 +69,12 @@ internal static class InstrumentedMethodWriter
         builder.Append(CSharpSymbolFormatter.FormatType(parameter.Type))
             .Append(' ')
             .Append(CSharpSymbolFormatter.EscapeIdentifier(parameter.Name));
-        if (includeDefault && parameter.HasExplicitDefaultValue)
+        if (!includeDefault || parameter is not { HasExplicitDefaultValue: true })
         {
-            builder.Append(" = ").Append(CSharpSymbolFormatter.FormatDefaultValue(parameter));
+            return;
         }
+
+        builder.Append(" = ").Append(CSharpDefaultValueFormatter.Format(parameter));
     }
 
     private static void AppendConstraints(StringBuilder builder, IMethodSymbol method)
@@ -84,7 +82,7 @@ internal static class InstrumentedMethodWriter
         foreach (var typeParameter in method.TypeParameters)
         {
             var constraints = CollectConstraints(typeParameter);
-            if (constraints.Count == 0)
+            if (constraints.Count is 0)
             {
                 continue;
             }
@@ -95,10 +93,10 @@ internal static class InstrumentedMethodWriter
 
     private static List<string> CollectConstraints(ITypeParameterSymbol typeParameter)
     {
-        var constraints = new List<string>();
+        List<string> constraints = new();
         if (typeParameter.HasReferenceTypeConstraint)
         {
-            constraints.Add(typeParameter.ReferenceTypeConstraintNullableAnnotation == NullableAnnotation.Annotated
+            constraints.Add(typeParameter.ReferenceTypeConstraintNullableAnnotation is NullableAnnotation.Annotated
                 ? "class?"
                 : "class");
         }
@@ -133,7 +131,7 @@ internal static class InstrumentedMethodWriter
 
     private static string BuildInvocation(IMethodSymbol method, bool explicitInterface)
     {
-        var builder = new StringBuilder();
+        StringBuilder builder = new();
         if (explicitInterface)
         {
             builder.Append("((").Append(CSharpSymbolFormatter.FormatType(method.ContainingType)).Append(")_inner).");
@@ -163,7 +161,7 @@ internal static class InstrumentedMethodWriter
 
     private static void AppendTypeArguments(StringBuilder builder, IMethodSymbol method)
     {
-        if (method.TypeParameters.Length == 0)
+        if (method.TypeParameters.Length is 0)
         {
             return;
         }
@@ -182,15 +180,8 @@ internal static class InstrumentedMethodWriter
         builder.Append('>');
     }
 
-    private static bool IsAsyncTask(ITypeSymbol returnType)
-    {
-        if (returnType is not INamedTypeSymbol named)
-        {
-            return false;
-        }
-
-        var fullName = named.OriginalDefinition.ToDisplayString();
-        return fullName == "System.Threading.Tasks.Task"
-               || fullName == "System.Threading.Tasks.Task<TResult>";
-    }
+    private static bool IsAsyncTask(ITypeSymbol returnType) =>
+        returnType is INamedTypeSymbol named
+        && named.OriginalDefinition.ToDisplayString() is
+            "System.Threading.Tasks.Task" or "System.Threading.Tasks.Task<TResult>";
 }

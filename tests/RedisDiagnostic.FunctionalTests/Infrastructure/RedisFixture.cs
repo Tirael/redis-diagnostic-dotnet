@@ -1,7 +1,3 @@
-using Prometheus;
-using StackExchange.Redis;
-using Testcontainers.Redis;
-
 namespace RedisDiagnostic.FunctionalTests.Infrastructure;
 
 public sealed class RedisFixture : IAsyncLifetime
@@ -35,13 +31,13 @@ public sealed class RedisFixture : IAsyncLifetime
         await _container.DisposeAsync();
     }
 
-    public string NewKey(string suffix = "k") => $"t:{Guid.NewGuid():N}:{suffix}";
+    public static string NewKey(string suffix = "k") => $"t:{Guid.NewGuid():N}:{suffix}";
 
     public RedisSession CreateSession()
     {
         var registry = Metrics.NewCustomRegistry();
-        var metrics = new PrometheusRedisMethodMetrics(registry, TimeProvider.System);
-        var database = new InstrumentedDatabase(_multiplexer.GetDatabase(), metrics);
-        return new RedisSession(database, Raw, registry);
+        PrometheusRedisMethodMetrics metrics = new(registry, TimeProvider.System);
+        InstrumentedDatabase database = new(_multiplexer.GetDatabase(), metrics);
+        return new(database, Raw, registry);
     }
 }

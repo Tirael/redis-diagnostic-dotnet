@@ -1,6 +1,3 @@
-using RedisDiagnostic.FunctionalTests.Infrastructure;
-using StackExchange.Redis;
-
 namespace RedisDiagnostic.FunctionalTests.Methods;
 
 [Collection(RedisCollection.Name)]
@@ -16,12 +13,12 @@ public sealed class KeyTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.StringSet(key, "v");
         var exists = session.Database.KeyExists(key);
-        Assert.True(exists);
+        exists.ShouldBeTrue();
         session.AssertObserved(nameof(IDatabase.KeyExists));
     }
 
@@ -31,12 +28,12 @@ public sealed class KeyTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.StringSet(key, "v");
         var exists = await session.Database.KeyExistsAsync(key);
-        Assert.True(exists);
+        exists.ShouldBeTrue();
         session.AssertObserved(nameof(IDatabase.KeyExistsAsync));
     }
 
@@ -46,13 +43,13 @@ public sealed class KeyTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.StringSet(key, "v");
         var deleted = session.Database.KeyDelete(key);
-        Assert.True(deleted);
-        Assert.False(session.Raw.KeyExists(key));
+        deleted.ShouldBeTrue();
+        session.Raw.KeyExists(key).ShouldBeFalse();
         session.AssertObserved(nameof(IDatabase.KeyDelete));
     }
 
@@ -62,13 +59,13 @@ public sealed class KeyTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.StringSet(key, "v");
         var deleted = await session.Database.KeyDeleteAsync(key);
-        Assert.True(deleted);
-        Assert.False(session.Raw.KeyExists(key));
+        deleted.ShouldBeTrue();
+        session.Raw.KeyExists(key).ShouldBeFalse();
         session.AssertObserved(nameof(IDatabase.KeyDeleteAsync));
     }
 
@@ -78,13 +75,13 @@ public sealed class KeyTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.StringSet(key, "v");
         var set = session.Database.KeyExpire(key, TimeSpan.FromMinutes(1));
-        Assert.True(set);
-        Assert.NotNull(session.Raw.KeyTimeToLive(key));
+        set.ShouldBeTrue();
+        session.Raw.KeyTimeToLive(key).ShouldNotBeNull();
         session.AssertObserved(nameof(IDatabase.KeyExpire));
     }
 
@@ -94,13 +91,13 @@ public sealed class KeyTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.StringSet(key, "v");
         var set = await session.Database.KeyExpireAsync(key, TimeSpan.FromMinutes(1));
-        Assert.True(set);
-        Assert.NotNull(session.Raw.KeyTimeToLive(key));
+        set.ShouldBeTrue();
+        session.Raw.KeyTimeToLive(key).ShouldNotBeNull();
         session.AssertObserved(nameof(IDatabase.KeyExpireAsync));
     }
 
@@ -110,12 +107,12 @@ public sealed class KeyTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.StringSet(key, "v", TimeSpan.FromMinutes(1));
         var when = session.Database.KeyExpireTime(key);
-        Assert.NotNull(when);
+        when.ShouldNotBeNull();
         session.AssertObserved(nameof(IDatabase.KeyExpireTime));
     }
 
@@ -125,12 +122,12 @@ public sealed class KeyTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.StringSet(key, "v", TimeSpan.FromMinutes(1));
         var when = await session.Database.KeyExpireTimeAsync(key);
-        Assert.NotNull(when);
+        when.ShouldNotBeNull();
         session.AssertObserved(nameof(IDatabase.KeyExpireTimeAsync));
     }
 
@@ -140,12 +137,12 @@ public sealed class KeyTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.StringSet(key, "v", TimeSpan.FromMinutes(1));
         var ttl = session.Database.KeyTimeToLive(key);
-        Assert.NotNull(ttl);
+        ttl.ShouldNotBeNull();
         session.AssertObserved(nameof(IDatabase.KeyTimeToLive));
     }
 
@@ -155,12 +152,12 @@ public sealed class KeyTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.StringSet(key, "v", TimeSpan.FromMinutes(1));
         var ttl = await session.Database.KeyTimeToLiveAsync(key);
-        Assert.NotNull(ttl);
+        ttl.ShouldNotBeNull();
         session.AssertObserved(nameof(IDatabase.KeyTimeToLiveAsync));
     }
 
@@ -170,13 +167,13 @@ public sealed class KeyTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.StringSet(key, "v", TimeSpan.FromMinutes(1));
         var persisted = session.Database.KeyPersist(key);
-        Assert.True(persisted);
-        Assert.Null(session.Raw.KeyTimeToLive(key));
+        persisted.ShouldBeTrue();
+        session.Raw.KeyTimeToLive(key).ShouldBeNull();
         session.AssertObserved(nameof(IDatabase.KeyPersist));
     }
 
@@ -186,13 +183,13 @@ public sealed class KeyTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.StringSet(key, "v", TimeSpan.FromMinutes(1));
         var persisted = await session.Database.KeyPersistAsync(key);
-        Assert.True(persisted);
-        Assert.Null(session.Raw.KeyTimeToLive(key));
+        persisted.ShouldBeTrue();
+        session.Raw.KeyTimeToLive(key).ShouldBeNull();
         session.AssertObserved(nameof(IDatabase.KeyPersistAsync));
     }
 
@@ -202,14 +199,14 @@ public sealed class KeyTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.StringSet(key, "v");
-        var dest = Fixture.NewKey("ren");
+        var dest = NewKey("ren");
         var renamed = session.Database.KeyRename(key, dest);
-        Assert.True(renamed);
-        Assert.Equal("v", (string?)session.Raw.StringGet(dest));
+        renamed.ShouldBeTrue();
+        ((string?)session.Raw.StringGet(dest)).ShouldBe("v");
         session.AssertObserved(nameof(IDatabase.KeyRename));
     }
 
@@ -219,14 +216,14 @@ public sealed class KeyTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.StringSet(key, "v");
-        var dest = Fixture.NewKey("ren");
+        var dest = NewKey("ren");
         var renamed = await session.Database.KeyRenameAsync(key, dest);
-        Assert.True(renamed);
-        Assert.Equal("v", (string?)session.Raw.StringGet(dest));
+        renamed.ShouldBeTrue();
+        ((string?)session.Raw.StringGet(dest)).ShouldBe("v");
         session.AssertObserved(nameof(IDatabase.KeyRenameAsync));
     }
 
@@ -236,14 +233,14 @@ public sealed class KeyTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.StringSet(key, "v");
-        var dest = Fixture.NewKey("cp");
+        var dest = NewKey("cp");
         var copied = session.Database.KeyCopy(key, dest);
-        Assert.True(copied);
-        Assert.Equal("v", (string?)session.Raw.StringGet(dest));
+        copied.ShouldBeTrue();
+        ((string?)session.Raw.StringGet(dest)).ShouldBe("v");
         session.AssertObserved(nameof(IDatabase.KeyCopy));
     }
 
@@ -253,14 +250,14 @@ public sealed class KeyTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.StringSet(key, "v");
-        var dest = Fixture.NewKey("cp");
+        var dest = NewKey("cp");
         var copied = await session.Database.KeyCopyAsync(key, dest);
-        Assert.True(copied);
-        Assert.Equal("v", (string?)session.Raw.StringGet(dest));
+        copied.ShouldBeTrue();
+        ((string?)session.Raw.StringGet(dest)).ShouldBe("v");
         session.AssertObserved(nameof(IDatabase.KeyCopyAsync));
     }
 
@@ -270,12 +267,12 @@ public sealed class KeyTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.StringSet(key, "v");
         var type = session.Database.KeyType(key);
-        Assert.Equal(RedisType.String, type);
+        type.ShouldBe(RedisType.String);
         session.AssertObserved(nameof(IDatabase.KeyType));
     }
 
@@ -285,12 +282,12 @@ public sealed class KeyTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.StringSet(key, "v");
         var type = await session.Database.KeyTypeAsync(key);
-        Assert.Equal(RedisType.String, type);
+        type.ShouldBe(RedisType.String);
         session.AssertObserved(nameof(IDatabase.KeyTypeAsync));
     }
 
@@ -300,12 +297,12 @@ public sealed class KeyTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.StringSet(key, "v");
         var touched = session.Database.KeyTouch(key);
-        Assert.True(touched);
+        touched.ShouldBeTrue();
         session.AssertObserved(nameof(IDatabase.KeyTouch));
     }
 
@@ -315,12 +312,12 @@ public sealed class KeyTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.StringSet(key, "v");
         var touched = await session.Database.KeyTouchAsync(key);
-        Assert.True(touched);
+        touched.ShouldBeTrue();
         session.AssertObserved(nameof(IDatabase.KeyTouchAsync));
     }
 
@@ -330,12 +327,12 @@ public sealed class KeyTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.StringSet(key, "v");
         var dump = session.Database.KeyDump(key);
-        Assert.NotNull(dump);
+        dump.ShouldNotBeNull();
         session.AssertObserved(nameof(IDatabase.KeyDump));
     }
 
@@ -345,12 +342,12 @@ public sealed class KeyTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.StringSet(key, "v");
         var dump = await session.Database.KeyDumpAsync(key);
-        Assert.NotNull(dump);
+        dump.ShouldNotBeNull();
         session.AssertObserved(nameof(IDatabase.KeyDumpAsync));
     }
 
@@ -360,14 +357,14 @@ public sealed class KeyTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.StringSet(key, "v");
         var dump = session.Raw.KeyDump(key)!;
         session.Raw.KeyDelete(key);
         session.Database.KeyRestore(key, dump);
-        Assert.Equal("v", (string?)session.Raw.StringGet(key));
+        ((string?)session.Raw.StringGet(key)).ShouldBe("v");
         session.AssertObserved(nameof(IDatabase.KeyRestore));
     }
 
@@ -377,14 +374,14 @@ public sealed class KeyTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.StringSet(key, "v");
         var dump = session.Raw.KeyDump(key)!;
         session.Raw.KeyDelete(key);
         await session.Database.KeyRestoreAsync(key, dump);
-        Assert.Equal("v", (string?)session.Raw.StringGet(key));
+        ((string?)session.Raw.StringGet(key)).ShouldBe("v");
         session.AssertObserved(nameof(IDatabase.KeyRestoreAsync));
     }
 
@@ -394,12 +391,12 @@ public sealed class KeyTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.StringSet(key, "v");
         var encoding = session.Database.KeyEncoding(key);
-        Assert.False(string.IsNullOrWhiteSpace(encoding));
+        encoding.ShouldNotBeNullOrWhiteSpace();
         session.AssertObserved(nameof(IDatabase.KeyEncoding));
     }
 
@@ -409,12 +406,12 @@ public sealed class KeyTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.StringSet(key, "v");
         var encoding = await session.Database.KeyEncodingAsync(key);
-        Assert.False(string.IsNullOrWhiteSpace(encoding));
+        encoding.ShouldNotBeNullOrWhiteSpace();
         session.AssertObserved(nameof(IDatabase.KeyEncodingAsync));
     }
 
@@ -424,12 +421,12 @@ public sealed class KeyTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.StringSet(key, "v");
         var count = session.Database.KeyRefCount(key);
-        Assert.True(count >= 1);
+        count.Should().BeGreaterThanOrEqualTo(1);
         session.AssertObserved(nameof(IDatabase.KeyRefCount));
     }
 
@@ -439,12 +436,12 @@ public sealed class KeyTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.StringSet(key, "v");
         var count = await session.Database.KeyRefCountAsync(key);
-        Assert.True(count >= 1);
+        count.Should().BeGreaterThanOrEqualTo(1);
         session.AssertObserved(nameof(IDatabase.KeyRefCountAsync));
     }
 
@@ -454,12 +451,12 @@ public sealed class KeyTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.StringSet(key, "v");
         var idle = session.Database.KeyIdleTime(key);
-        Assert.NotNull(idle);
+        idle.ShouldNotBeNull();
         session.AssertObserved(nameof(IDatabase.KeyIdleTime));
     }
 
@@ -469,12 +466,12 @@ public sealed class KeyTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.StringSet(key, "v");
         var idle = await session.Database.KeyIdleTimeAsync(key);
-        Assert.NotNull(idle);
+        idle.ShouldNotBeNull();
         session.AssertObserved(nameof(IDatabase.KeyIdleTimeAsync));
     }
 
@@ -484,12 +481,12 @@ public sealed class KeyTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.StringSet(key, "v");
         var random = session.Database.KeyRandom();
-        Assert.False(string.IsNullOrEmpty((string?)random));
+        ((string?)random).ShouldNotBeNullOrEmpty();
         session.AssertObserved(nameof(IDatabase.KeyRandom));
     }
 
@@ -499,12 +496,12 @@ public sealed class KeyTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.StringSet(key, "v");
         var random = await session.Database.KeyRandomAsync();
-        Assert.False(string.IsNullOrEmpty((string?)random));
+        ((string?)random).ShouldNotBeNullOrEmpty();
         session.AssertObserved(nameof(IDatabase.KeyRandomAsync));
     }
 
@@ -514,14 +511,14 @@ public sealed class KeyTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.StringSet(key, "v");
         var moved = session.Database.KeyMove(key, 1);
-        Assert.True(moved);
-        Assert.False(session.Raw.KeyExists(key));
-        Assert.Equal("v", (string?)Fixture.Multiplexer.GetDatabase(1).StringGet(key));
+        moved.ShouldBeTrue();
+        session.Raw.KeyExists(key).ShouldBeFalse();
+        ((string?)Fixture.Multiplexer.GetDatabase(1).StringGet(key)).ShouldBe("v");
         Fixture.Multiplexer.GetDatabase(1).KeyDelete(key);
         session.AssertObserved(nameof(IDatabase.KeyMove));
     }
@@ -532,63 +529,35 @@ public sealed class KeyTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.StringSet(key, "v");
         var moved = await session.Database.KeyMoveAsync(key, 1);
-        Assert.True(moved);
-        Assert.False(session.Raw.KeyExists(key));
-        Assert.Equal("v", (string?)Fixture.Multiplexer.GetDatabase(1).StringGet(key));
+        moved.ShouldBeTrue();
+        session.Raw.KeyExists(key).ShouldBeFalse();
+        ((string?)Fixture.Multiplexer.GetDatabase(1).StringGet(key)).ShouldBe("v");
         Fixture.Multiplexer.GetDatabase(1).KeyDelete(key);
         session.AssertObserved(nameof(IDatabase.KeyMoveAsync));
     }
 
     [Fact(Skip = "Requires a second Redis instance")]
     [RedisMethod(nameof(IDatabase.KeyMigrate))]
-    public void Given_redis_When_KeyMigrate_Then_state_and_metric_are_observed()
-    {
-        // Arrange
-        var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
-
-        // Act / Assert
-        Assert.True(true);
-    }
+    public void Given_redis_When_KeyMigrate_Then_state_and_metric_are_observed() =>
+        _ = nameof(IDatabase.KeyMigrate);
 
     [Fact(Skip = "Requires a second Redis instance")]
     [RedisMethod(nameof(IDatabase.KeyMigrateAsync))]
-    public void Given_redis_When_KeyMigrateAsync_Then_state_and_metric_are_observed()
-    {
-        // Arrange
-        var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
-
-        // Act / Assert
-        Assert.True(true);
-    }
+    public void Given_redis_When_KeyMigrateAsync_Then_state_and_metric_are_observed() =>
+        _ = nameof(IDatabase.KeyMigrateAsync);
 
     [Fact(Skip = "Requires maxmemory-policy LFU")]
     [RedisMethod(nameof(IDatabase.KeyFrequency))]
-    public void Given_redis_When_KeyFrequency_Then_state_and_metric_are_observed()
-    {
-        // Arrange
-        var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
-
-        // Act / Assert
-        Assert.True(true);
-    }
+    public void Given_redis_When_KeyFrequency_Then_state_and_metric_are_observed() =>
+        _ = nameof(IDatabase.KeyFrequency);
 
     [Fact(Skip = "Requires maxmemory-policy LFU")]
     [RedisMethod(nameof(IDatabase.KeyFrequencyAsync))]
-    public void Given_redis_When_KeyFrequencyAsync_Then_state_and_metric_are_observed()
-    {
-        // Arrange
-        var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
-
-        // Act / Assert
-        Assert.True(true);
-    }
+    public void Given_redis_When_KeyFrequencyAsync_Then_state_and_metric_are_observed() =>
+        _ = nameof(IDatabase.KeyFrequencyAsync);
 }

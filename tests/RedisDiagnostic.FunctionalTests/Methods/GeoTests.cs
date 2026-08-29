@@ -1,6 +1,3 @@
-using RedisDiagnostic.FunctionalTests.Infrastructure;
-using StackExchange.Redis;
-
 namespace RedisDiagnostic.FunctionalTests.Methods;
 
 [Collection(RedisCollection.Name)]
@@ -16,11 +13,11 @@ public sealed class GeoTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         var added = session.Database.GeoAdd(key, 13.361389, 38.115556, "Palermo");
-        Assert.True(added);
+        added.ShouldBeTrue();
         session.AssertObserved(nameof(IDatabase.GeoAdd));
     }
 
@@ -30,11 +27,11 @@ public sealed class GeoTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         var added = await session.Database.GeoAddAsync(key, 13.361389, 38.115556, "Palermo");
-        Assert.True(added);
+        added.ShouldBeTrue();
         session.AssertObserved(nameof(IDatabase.GeoAddAsync));
     }
 
@@ -44,12 +41,12 @@ public sealed class GeoTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.GeoAdd(key, 13.361389, 38.115556, "Palermo");
         var removed = session.Database.GeoRemove(key, "Palermo");
-        Assert.True(removed);
+        removed.ShouldBeTrue();
         session.AssertObserved(nameof(IDatabase.GeoRemove));
     }
 
@@ -59,12 +56,12 @@ public sealed class GeoTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.GeoAdd(key, 13.361389, 38.115556, "Palermo");
         var removed = await session.Database.GeoRemoveAsync(key, "Palermo");
-        Assert.True(removed);
+        removed.ShouldBeTrue();
         session.AssertObserved(nameof(IDatabase.GeoRemoveAsync));
     }
 
@@ -74,13 +71,13 @@ public sealed class GeoTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.GeoAdd(key, 13.361389, 38.115556, "Palermo");
         session.Raw.GeoAdd(key, 15.087269, 37.502669, "Catania");
         var distance = session.Database.GeoDistance(key, "Palermo", "Catania");
-        Assert.NotNull(distance);
+        distance.ShouldNotBeNull();
         session.AssertObserved(nameof(IDatabase.GeoDistance));
     }
 
@@ -90,13 +87,13 @@ public sealed class GeoTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.GeoAdd(key, 13.361389, 38.115556, "Palermo");
         session.Raw.GeoAdd(key, 15.087269, 37.502669, "Catania");
         var distance = await session.Database.GeoDistanceAsync(key, "Palermo", "Catania");
-        Assert.NotNull(distance);
+        distance.ShouldNotBeNull();
         session.AssertObserved(nameof(IDatabase.GeoDistanceAsync));
     }
 
@@ -106,12 +103,12 @@ public sealed class GeoTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.GeoAdd(key, 13.361389, 38.115556, "Palermo");
         var hash = session.Database.GeoHash(key, "Palermo");
-        Assert.False(string.IsNullOrWhiteSpace(hash));
+        hash.ShouldNotBeNullOrWhiteSpace();
         session.AssertObserved(nameof(IDatabase.GeoHash));
     }
 
@@ -121,12 +118,12 @@ public sealed class GeoTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.GeoAdd(key, 13.361389, 38.115556, "Palermo");
         var hash = await session.Database.GeoHashAsync(key, "Palermo");
-        Assert.False(string.IsNullOrWhiteSpace(hash));
+        hash.ShouldNotBeNullOrWhiteSpace();
         session.AssertObserved(nameof(IDatabase.GeoHashAsync));
     }
 
@@ -136,12 +133,12 @@ public sealed class GeoTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.GeoAdd(key, 13.361389, 38.115556, "Palermo");
         var position = session.Database.GeoPosition(key, "Palermo");
-        Assert.NotNull(position);
+        position.ShouldNotBeNull();
         session.AssertObserved(nameof(IDatabase.GeoPosition));
     }
 
@@ -151,12 +148,12 @@ public sealed class GeoTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.GeoAdd(key, 13.361389, 38.115556, "Palermo");
         var position = await session.Database.GeoPositionAsync(key, "Palermo");
-        Assert.NotNull(position);
+        position.ShouldNotBeNull();
         session.AssertObserved(nameof(IDatabase.GeoPositionAsync));
     }
 
@@ -166,12 +163,12 @@ public sealed class GeoTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.GeoAdd(key, 13.361389, 38.115556, "Palermo");
         var results = session.Database.GeoRadius(key, 13.361389, 38.115556, 100, GeoUnit.Kilometers);
-        Assert.NotEmpty(results);
+        results.Should().NotBeEmpty();
         session.AssertObserved(nameof(IDatabase.GeoRadius));
     }
 
@@ -181,12 +178,12 @@ public sealed class GeoTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.GeoAdd(key, 13.361389, 38.115556, "Palermo");
         var results = await session.Database.GeoRadiusAsync(key, 13.361389, 38.115556, 100, GeoUnit.Kilometers);
-        Assert.NotEmpty(results);
+        results.Should().NotBeEmpty();
         session.AssertObserved(nameof(IDatabase.GeoRadiusAsync));
     }
 
@@ -196,12 +193,12 @@ public sealed class GeoTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.GeoAdd(key, 13.361389, 38.115556, "Palermo");
         var results = session.Database.GeoSearch(key, 13.361389, 38.115556, new GeoSearchCircle(100, GeoUnit.Kilometers));
-        Assert.NotEmpty(results);
+        results.Should().NotBeEmpty();
         session.AssertObserved(nameof(IDatabase.GeoSearch));
     }
 
@@ -211,12 +208,12 @@ public sealed class GeoTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.GeoAdd(key, 13.361389, 38.115556, "Palermo");
         var results = await session.Database.GeoSearchAsync(key, 13.361389, 38.115556, new GeoSearchCircle(100, GeoUnit.Kilometers));
-        Assert.NotEmpty(results);
+        results.Should().NotBeEmpty();
         session.AssertObserved(nameof(IDatabase.GeoSearchAsync));
     }
 
@@ -226,13 +223,13 @@ public sealed class GeoTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
-        var dest = Fixture.NewKey("gd");
+        var dest = NewKey("gd");
         session.Raw.GeoAdd(key, 13.361389, 38.115556, "Palermo");
         var stored = session.Database.GeoSearchAndStore(key, dest, 13.361389, 38.115556, new GeoSearchCircle(100, GeoUnit.Kilometers));
-        Assert.Equal(1, stored);
+        stored.ShouldBe(1);
         session.AssertObserved(nameof(IDatabase.GeoSearchAndStore));
     }
 
@@ -242,13 +239,13 @@ public sealed class GeoTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
-        var dest = Fixture.NewKey("gd");
+        var dest = NewKey("gd");
         session.Raw.GeoAdd(key, 13.361389, 38.115556, "Palermo");
         var stored = await session.Database.GeoSearchAndStoreAsync(key, dest, 13.361389, 38.115556, new GeoSearchCircle(100, GeoUnit.Kilometers));
-        Assert.Equal(1, stored);
+        stored.ShouldBe(1);
         session.AssertObserved(nameof(IDatabase.GeoSearchAndStoreAsync));
     }
 }
