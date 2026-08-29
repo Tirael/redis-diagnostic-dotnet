@@ -1,7 +1,3 @@
-using Microsoft.Extensions.DependencyInjection;
-using Prometheus;
-using StackExchange.Redis;
-
 namespace RedisDiagnostic;
 
 /// <summary>

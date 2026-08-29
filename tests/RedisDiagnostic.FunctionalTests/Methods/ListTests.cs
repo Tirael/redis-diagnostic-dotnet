@@ -1,6 +1,3 @@
-using RedisDiagnostic.FunctionalTests.Infrastructure;
-using StackExchange.Redis;
-
 namespace RedisDiagnostic.FunctionalTests.Methods;
 
 [Collection(RedisCollection.Name)]
@@ -16,12 +13,12 @@ public sealed class ListTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         var length = session.Database.ListLeftPush(key, "a");
-        Assert.Equal(1, length);
-        Assert.Equal("a", (string?)session.Raw.ListGetByIndex(key, 0));
+        length.ShouldBe(1);
+        ((string?)session.Raw.ListGetByIndex(key, 0)).ShouldBe("a");
         session.AssertObserved(nameof(IDatabase.ListLeftPush));
     }
 
@@ -31,11 +28,11 @@ public sealed class ListTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         var length = await session.Database.ListLeftPushAsync(key, "a");
-        Assert.Equal(1, length);
+        length.ShouldBe(1);
         session.AssertObserved(nameof(IDatabase.ListLeftPushAsync));
     }
 
@@ -45,11 +42,11 @@ public sealed class ListTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         var length = session.Database.ListRightPush(key, "a");
-        Assert.Equal(1, length);
+        length.ShouldBe(1);
         session.AssertObserved(nameof(IDatabase.ListRightPush));
     }
 
@@ -59,11 +56,11 @@ public sealed class ListTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         var length = await session.Database.ListRightPushAsync(key, "a");
-        Assert.Equal(1, length);
+        length.ShouldBe(1);
         session.AssertObserved(nameof(IDatabase.ListRightPushAsync));
     }
 
@@ -73,12 +70,12 @@ public sealed class ListTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.ListRightPush(key, "a");
         var value = session.Database.ListLeftPop(key);
-        Assert.Equal("a", (string?)value);
+        ((string?)value).ShouldBe("a");
         session.AssertObserved(nameof(IDatabase.ListLeftPop));
     }
 
@@ -88,12 +85,12 @@ public sealed class ListTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.ListRightPush(key, "a");
         var value = await session.Database.ListLeftPopAsync(key);
-        Assert.Equal("a", (string?)value);
+        ((string?)value).ShouldBe("a");
         session.AssertObserved(nameof(IDatabase.ListLeftPopAsync));
     }
 
@@ -103,12 +100,12 @@ public sealed class ListTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.ListRightPush(key, "a");
         var value = session.Database.ListRightPop(key);
-        Assert.Equal("a", (string?)value);
+        ((string?)value).ShouldBe("a");
         session.AssertObserved(nameof(IDatabase.ListRightPop));
     }
 
@@ -118,12 +115,12 @@ public sealed class ListTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.ListRightPush(key, "a");
         var value = await session.Database.ListRightPopAsync(key);
-        Assert.Equal("a", (string?)value);
+        ((string?)value).ShouldBe("a");
         session.AssertObserved(nameof(IDatabase.ListRightPopAsync));
     }
 
@@ -133,12 +130,12 @@ public sealed class ListTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.ListRightPush(key, "a");
         var length = session.Database.ListLength(key);
-        Assert.Equal(1, length);
+        length.ShouldBe(1);
         session.AssertObserved(nameof(IDatabase.ListLength));
     }
 
@@ -148,12 +145,12 @@ public sealed class ListTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.ListRightPush(key, "a");
         var length = await session.Database.ListLengthAsync(key);
-        Assert.Equal(1, length);
+        length.ShouldBe(1);
         session.AssertObserved(nameof(IDatabase.ListLengthAsync));
     }
 
@@ -163,12 +160,12 @@ public sealed class ListTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.ListRightPush(key, "a");
         var values = session.Database.ListRange(key);
-        Assert.Equal("a", (string?)values[0]);
+        ((string?)values[0]).ShouldBe("a");
         session.AssertObserved(nameof(IDatabase.ListRange));
     }
 
@@ -178,12 +175,12 @@ public sealed class ListTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.ListRightPush(key, "a");
         var values = await session.Database.ListRangeAsync(key);
-        Assert.Equal("a", (string?)values[0]);
+        ((string?)values[0]).ShouldBe("a");
         session.AssertObserved(nameof(IDatabase.ListRangeAsync));
     }
 
@@ -193,12 +190,12 @@ public sealed class ListTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.ListRightPush(key, "a");
         var value = session.Database.ListGetByIndex(key, 0);
-        Assert.Equal("a", (string?)value);
+        ((string?)value).ShouldBe("a");
         session.AssertObserved(nameof(IDatabase.ListGetByIndex));
     }
 
@@ -208,12 +205,12 @@ public sealed class ListTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.ListRightPush(key, "a");
         var value = await session.Database.ListGetByIndexAsync(key, 0);
-        Assert.Equal("a", (string?)value);
+        ((string?)value).ShouldBe("a");
         session.AssertObserved(nameof(IDatabase.ListGetByIndexAsync));
     }
 
@@ -223,12 +220,12 @@ public sealed class ListTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.ListRightPush(key, "a");
         session.Database.ListSetByIndex(key, 0, "b");
-        Assert.Equal("b", (string?)session.Raw.ListGetByIndex(key, 0));
+        ((string?)session.Raw.ListGetByIndex(key, 0)).ShouldBe("b");
         session.AssertObserved(nameof(IDatabase.ListSetByIndex));
     }
 
@@ -238,12 +235,12 @@ public sealed class ListTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.ListRightPush(key, "a");
         await session.Database.ListSetByIndexAsync(key, 0, "b");
-        Assert.Equal("b", (string?)session.Raw.ListGetByIndex(key, 0));
+        ((string?)session.Raw.ListGetByIndex(key, 0)).ShouldBe("b");
         session.AssertObserved(nameof(IDatabase.ListSetByIndexAsync));
     }
 
@@ -253,12 +250,12 @@ public sealed class ListTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.ListRightPush(key, "a");
         var length = session.Database.ListInsertAfter(key, "a", "b");
-        Assert.Equal(2, length);
+        length.ShouldBe(2);
         session.AssertObserved(nameof(IDatabase.ListInsertAfter));
     }
 
@@ -268,12 +265,12 @@ public sealed class ListTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.ListRightPush(key, "a");
         var length = await session.Database.ListInsertAfterAsync(key, "a", "b");
-        Assert.Equal(2, length);
+        length.ShouldBe(2);
         session.AssertObserved(nameof(IDatabase.ListInsertAfterAsync));
     }
 
@@ -283,12 +280,12 @@ public sealed class ListTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.ListRightPush(key, "a");
         var length = session.Database.ListInsertBefore(key, "a", "b");
-        Assert.Equal(2, length);
+        length.ShouldBe(2);
         session.AssertObserved(nameof(IDatabase.ListInsertBefore));
     }
 
@@ -298,12 +295,12 @@ public sealed class ListTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.ListRightPush(key, "a");
         var length = await session.Database.ListInsertBeforeAsync(key, "a", "b");
-        Assert.Equal(2, length);
+        length.ShouldBe(2);
         session.AssertObserved(nameof(IDatabase.ListInsertBeforeAsync));
     }
 
@@ -313,12 +310,12 @@ public sealed class ListTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.ListRightPush(key, "a");
         var removed = session.Database.ListRemove(key, "a");
-        Assert.Equal(1, removed);
+        removed.ShouldBe(1);
         session.AssertObserved(nameof(IDatabase.ListRemove));
     }
 
@@ -328,12 +325,12 @@ public sealed class ListTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.ListRightPush(key, "a");
         var removed = await session.Database.ListRemoveAsync(key, "a");
-        Assert.Equal(1, removed);
+        removed.ShouldBe(1);
         session.AssertObserved(nameof(IDatabase.ListRemoveAsync));
     }
 
@@ -343,12 +340,12 @@ public sealed class ListTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.ListRightPush(key, ["a", "b", "c"]);
         session.Database.ListTrim(key, 0, 1);
-        Assert.Equal(2, session.Raw.ListLength(key));
+        session.Raw.ListLength(key).ShouldBe(2);
         session.AssertObserved(nameof(IDatabase.ListTrim));
     }
 
@@ -358,12 +355,12 @@ public sealed class ListTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.ListRightPush(key, ["a", "b", "c"]);
         await session.Database.ListTrimAsync(key, 0, 1);
-        Assert.Equal(2, session.Raw.ListLength(key));
+        session.Raw.ListLength(key).ShouldBe(2);
         session.AssertObserved(nameof(IDatabase.ListTrimAsync));
     }
 
@@ -373,12 +370,12 @@ public sealed class ListTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.ListRightPush(key, "a");
         var position = session.Database.ListPosition(key, "a");
-        Assert.Equal(0, position);
+        position.ShouldBe(0);
         session.AssertObserved(nameof(IDatabase.ListPosition));
     }
 
@@ -388,12 +385,12 @@ public sealed class ListTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.ListRightPush(key, "a");
         var position = await session.Database.ListPositionAsync(key, "a");
-        Assert.Equal(0, position);
+        position.ShouldBe(0);
         session.AssertObserved(nameof(IDatabase.ListPositionAsync));
     }
 
@@ -403,12 +400,12 @@ public sealed class ListTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.ListRightPush(key, "a");
         var positions = session.Database.ListPositions(key, "a", 1);
-        Assert.Equal(0, positions[0]);
+        positions[0].ShouldBe(0);
         session.AssertObserved(nameof(IDatabase.ListPositions));
     }
 
@@ -418,12 +415,12 @@ public sealed class ListTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.ListRightPush(key, "a");
         var positions = await session.Database.ListPositionsAsync(key, "a", 1);
-        Assert.Equal(0, positions[0]);
+        positions[0].ShouldBe(0);
         session.AssertObserved(nameof(IDatabase.ListPositionsAsync));
     }
 
@@ -433,14 +430,14 @@ public sealed class ListTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
-        var dest = Fixture.NewKey("ld");
+        var dest = NewKey("ld");
         session.Raw.ListRightPush(key, "a");
         var moved = session.Database.ListMove(key, dest, ListSide.Left, ListSide.Right);
-        Assert.Equal("a", (string?)moved);
-        Assert.Equal("a", (string?)session.Raw.ListGetByIndex(dest, 0));
+        ((string?)moved).ShouldBe("a");
+        ((string?)session.Raw.ListGetByIndex(dest, 0)).ShouldBe("a");
         session.AssertObserved(nameof(IDatabase.ListMove));
     }
 
@@ -450,13 +447,13 @@ public sealed class ListTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
-        var dest = Fixture.NewKey("ld");
+        var dest = NewKey("ld");
         session.Raw.ListRightPush(key, "a");
         var moved = await session.Database.ListMoveAsync(key, dest, ListSide.Left, ListSide.Right);
-        Assert.Equal("a", (string?)moved);
+        ((string?)moved).ShouldBe("a");
         session.AssertObserved(nameof(IDatabase.ListMoveAsync));
     }
 
@@ -466,13 +463,13 @@ public sealed class ListTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
-        var dest = Fixture.NewKey("ld");
+        var dest = NewKey("ld");
         session.Raw.ListRightPush(key, "a");
         var moved = session.Database.ListRightPopLeftPush(key, dest);
-        Assert.Equal("a", (string?)moved);
+        ((string?)moved).ShouldBe("a");
         session.AssertObserved(nameof(IDatabase.ListRightPopLeftPush));
     }
 
@@ -482,13 +479,13 @@ public sealed class ListTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
-        var dest = Fixture.NewKey("ld");
+        var dest = NewKey("ld");
         session.Raw.ListRightPush(key, "a");
         var moved = await session.Database.ListRightPopLeftPushAsync(key, dest);
-        Assert.Equal("a", (string?)moved);
+        ((string?)moved).ShouldBe("a");
         session.AssertObserved(nameof(IDatabase.ListRightPopLeftPushAsync));
     }
 }

@@ -1,6 +1,3 @@
-using RedisDiagnostic.FunctionalTests.Infrastructure;
-using StackExchange.Redis;
-
 namespace RedisDiagnostic.FunctionalTests.Methods;
 
 [Collection(RedisCollection.Name)]
@@ -16,12 +13,12 @@ public sealed class HashTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         var created = session.Database.HashSet(key, "f", "v");
-        Assert.True(created);
-        Assert.Equal("v", (string?)session.Raw.HashGet(key, "f"));
+        created.ShouldBeTrue();
+        ((string?)session.Raw.HashGet(key, "f")).ShouldBe("v");
         session.AssertObserved(nameof(IDatabase.HashSet));
     }
 
@@ -31,12 +28,12 @@ public sealed class HashTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         var created = await session.Database.HashSetAsync(key, "f", "v");
-        Assert.True(created);
-        Assert.Equal("v", (string?)session.Raw.HashGet(key, "f"));
+        created.ShouldBeTrue();
+        ((string?)session.Raw.HashGet(key, "f")).ShouldBe("v");
         session.AssertObserved(nameof(IDatabase.HashSetAsync));
     }
 
@@ -46,12 +43,12 @@ public sealed class HashTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.HashSet(key, "f", "v");
         var value = session.Database.HashGet(key, "f");
-        Assert.Equal("v", (string?)value);
+        ((string?)value).ShouldBe("v");
         session.AssertObserved(nameof(IDatabase.HashGet));
     }
 
@@ -61,12 +58,12 @@ public sealed class HashTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.HashSet(key, "f", "v");
         var value = await session.Database.HashGetAsync(key, "f");
-        Assert.Equal("v", (string?)value);
+        ((string?)value).ShouldBe("v");
         session.AssertObserved(nameof(IDatabase.HashGetAsync));
     }
 
@@ -76,12 +73,12 @@ public sealed class HashTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.HashSet(key, "f", "v");
         var entries = session.Database.HashGetAll(key);
-        Assert.Single(entries);
+        entries.Should().ContainSingle();
         session.AssertObserved(nameof(IDatabase.HashGetAll));
     }
 
@@ -91,12 +88,12 @@ public sealed class HashTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.HashSet(key, "f", "v");
         var entries = await session.Database.HashGetAllAsync(key);
-        Assert.Single(entries);
+        entries.Should().ContainSingle();
         session.AssertObserved(nameof(IDatabase.HashGetAllAsync));
     }
 
@@ -106,13 +103,13 @@ public sealed class HashTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.HashSet(key, "f", "v");
         var deleted = session.Database.HashDelete(key, "f");
-        Assert.True(deleted);
-        Assert.False(session.Raw.HashExists(key, "f"));
+        deleted.ShouldBeTrue();
+        session.Raw.HashExists(key, "f").ShouldBeFalse();
         session.AssertObserved(nameof(IDatabase.HashDelete));
     }
 
@@ -122,13 +119,13 @@ public sealed class HashTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.HashSet(key, "f", "v");
         var deleted = await session.Database.HashDeleteAsync(key, "f");
-        Assert.True(deleted);
-        Assert.False(session.Raw.HashExists(key, "f"));
+        deleted.ShouldBeTrue();
+        session.Raw.HashExists(key, "f").ShouldBeFalse();
         session.AssertObserved(nameof(IDatabase.HashDeleteAsync));
     }
 
@@ -138,12 +135,12 @@ public sealed class HashTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.HashSet(key, "f", "v");
         var exists = session.Database.HashExists(key, "f");
-        Assert.True(exists);
+        exists.ShouldBeTrue();
         session.AssertObserved(nameof(IDatabase.HashExists));
     }
 
@@ -153,12 +150,12 @@ public sealed class HashTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.HashSet(key, "f", "v");
         var exists = await session.Database.HashExistsAsync(key, "f");
-        Assert.True(exists);
+        exists.ShouldBeTrue();
         session.AssertObserved(nameof(IDatabase.HashExistsAsync));
     }
 
@@ -168,11 +165,11 @@ public sealed class HashTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         var value = session.Database.HashIncrement(key, "n");
-        Assert.Equal(1, value);
+        value.ShouldBe(1);
         session.AssertObserved(nameof(IDatabase.HashIncrement));
     }
 
@@ -182,11 +179,11 @@ public sealed class HashTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         var value = await session.Database.HashIncrementAsync(key, "n");
-        Assert.Equal(1, value);
+        value.ShouldBe(1);
         session.AssertObserved(nameof(IDatabase.HashIncrementAsync));
     }
 
@@ -196,12 +193,12 @@ public sealed class HashTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.HashSet(key, "n", "5");
         var value = session.Database.HashDecrement(key, "n");
-        Assert.Equal(4, value);
+        value.ShouldBe(4);
         session.AssertObserved(nameof(IDatabase.HashDecrement));
     }
 
@@ -211,12 +208,12 @@ public sealed class HashTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.HashSet(key, "n", "5");
         var value = await session.Database.HashDecrementAsync(key, "n");
-        Assert.Equal(4, value);
+        value.ShouldBe(4);
         session.AssertObserved(nameof(IDatabase.HashDecrementAsync));
     }
 
@@ -226,12 +223,12 @@ public sealed class HashTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.HashSet(key, "f", "v");
         var keys = session.Database.HashKeys(key);
-        Assert.Equal("f", (string?)keys[0]);
+        ((string?)keys[0]).ShouldBe("f");
         session.AssertObserved(nameof(IDatabase.HashKeys));
     }
 
@@ -241,12 +238,12 @@ public sealed class HashTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.HashSet(key, "f", "v");
         var keys = await session.Database.HashKeysAsync(key);
-        Assert.Equal("f", (string?)keys[0]);
+        ((string?)keys[0]).ShouldBe("f");
         session.AssertObserved(nameof(IDatabase.HashKeysAsync));
     }
 
@@ -256,12 +253,12 @@ public sealed class HashTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.HashSet(key, "f", "v");
         var values = session.Database.HashValues(key);
-        Assert.Equal("v", (string?)values[0]);
+        ((string?)values[0]).ShouldBe("v");
         session.AssertObserved(nameof(IDatabase.HashValues));
     }
 
@@ -271,12 +268,12 @@ public sealed class HashTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.HashSet(key, "f", "v");
         var values = await session.Database.HashValuesAsync(key);
-        Assert.Equal("v", (string?)values[0]);
+        ((string?)values[0]).ShouldBe("v");
         session.AssertObserved(nameof(IDatabase.HashValuesAsync));
     }
 
@@ -286,12 +283,12 @@ public sealed class HashTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.HashSet(key, "f", "v");
         var length = session.Database.HashLength(key);
-        Assert.Equal(1, length);
+        length.ShouldBe(1);
         session.AssertObserved(nameof(IDatabase.HashLength));
     }
 
@@ -301,12 +298,12 @@ public sealed class HashTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.HashSet(key, "f", "v");
         var length = await session.Database.HashLengthAsync(key);
-        Assert.Equal(1, length);
+        length.ShouldBe(1);
         session.AssertObserved(nameof(IDatabase.HashLengthAsync));
     }
 
@@ -316,12 +313,12 @@ public sealed class HashTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.HashSet(key, "f", "ab");
         var length = session.Database.HashStringLength(key, "f");
-        Assert.Equal(2, length);
+        length.ShouldBe(2);
         session.AssertObserved(nameof(IDatabase.HashStringLength));
     }
 
@@ -331,12 +328,12 @@ public sealed class HashTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.HashSet(key, "f", "ab");
         var length = await session.Database.HashStringLengthAsync(key, "f");
-        Assert.Equal(2, length);
+        length.ShouldBe(2);
         session.AssertObserved(nameof(IDatabase.HashStringLengthAsync));
     }
 
@@ -346,12 +343,12 @@ public sealed class HashTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.HashSet(key, "f", "v");
         var field = session.Database.HashRandomField(key);
-        Assert.Equal("f", (string?)field);
+        ((string?)field).ShouldBe("f");
         session.AssertObserved(nameof(IDatabase.HashRandomField));
     }
 
@@ -361,12 +358,12 @@ public sealed class HashTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.HashSet(key, "f", "v");
         var field = await session.Database.HashRandomFieldAsync(key);
-        Assert.Equal("f", (string?)field);
+        ((string?)field).ShouldBe("f");
         session.AssertObserved(nameof(IDatabase.HashRandomFieldAsync));
     }
 
@@ -376,12 +373,12 @@ public sealed class HashTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.HashSet(key, "f", "v");
         var fields = session.Database.HashRandomFields(key, 1);
-        Assert.Single(fields);
+        fields.Should().ContainSingle();
         session.AssertObserved(nameof(IDatabase.HashRandomFields));
     }
 
@@ -391,12 +388,12 @@ public sealed class HashTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.HashSet(key, "f", "v");
         var fields = await session.Database.HashRandomFieldsAsync(key, 1);
-        Assert.Single(fields);
+        fields.Should().ContainSingle();
         session.AssertObserved(nameof(IDatabase.HashRandomFieldsAsync));
     }
 
@@ -406,12 +403,12 @@ public sealed class HashTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.HashSet(key, "f", "v");
         var entries = session.Database.HashRandomFieldsWithValues(key, 1);
-        Assert.Single(entries);
+        entries.Should().ContainSingle();
         session.AssertObserved(nameof(IDatabase.HashRandomFieldsWithValues));
     }
 
@@ -421,12 +418,12 @@ public sealed class HashTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.HashSet(key, "f", "v");
         var entries = await session.Database.HashRandomFieldsWithValuesAsync(key, 1);
-        Assert.Single(entries);
+        entries.Should().ContainSingle();
         session.AssertObserved(nameof(IDatabase.HashRandomFieldsWithValuesAsync));
     }
 
@@ -436,12 +433,12 @@ public sealed class HashTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.HashSet(key, "f", "v");
         var entries = session.Database.HashScan(key).ToArray();
-        Assert.Single(entries);
+        entries.Should().ContainSingle();
         session.AssertObserved(nameof(IDatabase.HashScan));
     }
 
@@ -451,16 +448,16 @@ public sealed class HashTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.HashSet(key, "f", "v");
-        var entries = new List<HashEntry>();
+        List<HashEntry> entries = new();
         await foreach (var entry in session.Database.HashScanAsync(key))
         {
             entries.Add(entry);
         }
-        Assert.Single(entries);
+        entries.Should().ContainSingle();
         session.AssertObserved(nameof(IDatabase.HashScanAsync));
     }
 
@@ -470,12 +467,12 @@ public sealed class HashTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.HashSet(key, "f", "v");
         var fields = session.Database.HashScanNoValues(key).ToArray();
-        Assert.Equal("f", (string?)fields[0]);
+        ((string?)fields[0]).ShouldBe("f");
         session.AssertObserved(nameof(IDatabase.HashScanNoValues));
     }
 
@@ -485,16 +482,16 @@ public sealed class HashTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.HashSet(key, "f", "v");
-        var fields = new List<RedisValue>();
+        List<RedisValue> fields = new();
         await foreach (var field in session.Database.HashScanNoValuesAsync(key))
         {
             fields.Add(field);
         }
-        Assert.Equal("f", (string?)fields[0]);
+        ((string?)fields[0]).ShouldBe("f");
         session.AssertObserved(nameof(IDatabase.HashScanNoValuesAsync));
     }
 
@@ -504,12 +501,12 @@ public sealed class HashTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.HashSet(key, "f", "v");
         using var lease = session.Database.HashGetLease(key, "f");
-        Assert.NotNull(lease);
+        lease.ShouldNotBeNull();
         session.AssertObserved(nameof(IDatabase.HashGetLease));
     }
 
@@ -519,12 +516,12 @@ public sealed class HashTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.HashSet(key, "f", "v");
         using var lease = await session.Database.HashGetLeaseAsync(key, "f");
-        Assert.NotNull(lease);
+        lease.ShouldNotBeNull();
         session.AssertObserved(nameof(IDatabase.HashGetLeaseAsync));
     }
 
@@ -534,12 +531,12 @@ public sealed class HashTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.HashSet(key, "f", "v");
         var results = session.Database.HashFieldExpire(key, ["f"], TimeSpan.FromMinutes(1));
-        Assert.Equal(ExpireResult.Success, results[0]);
+        results[0].ShouldBe(ExpireResult.Success);
         session.AssertObserved(nameof(IDatabase.HashFieldExpire));
     }
 
@@ -549,12 +546,12 @@ public sealed class HashTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.HashSet(key, "f", "v");
         var results = await session.Database.HashFieldExpireAsync(key, ["f"], TimeSpan.FromMinutes(1));
-        Assert.Equal(ExpireResult.Success, results[0]);
+        results[0].ShouldBe(ExpireResult.Success);
         session.AssertObserved(nameof(IDatabase.HashFieldExpireAsync));
     }
 
@@ -564,13 +561,13 @@ public sealed class HashTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.HashSet(key, "f", "v");
         session.Raw.HashFieldExpire(key, ["f"], TimeSpan.FromMinutes(1));
         var ttl = session.Database.HashFieldGetTimeToLive(key, ["f"]);
-        Assert.True(ttl[0] > 0);
+        ttl[0].ShouldBeGreaterThan(0);
         session.AssertObserved(nameof(IDatabase.HashFieldGetTimeToLive));
     }
 
@@ -580,13 +577,13 @@ public sealed class HashTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.HashSet(key, "f", "v");
         session.Raw.HashFieldExpire(key, ["f"], TimeSpan.FromMinutes(1));
         var ttl = await session.Database.HashFieldGetTimeToLiveAsync(key, ["f"]);
-        Assert.True(ttl[0] > 0);
+        ttl[0].ShouldBeGreaterThan(0);
         session.AssertObserved(nameof(IDatabase.HashFieldGetTimeToLiveAsync));
     }
 
@@ -596,13 +593,13 @@ public sealed class HashTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.HashSet(key, "f", "v");
         session.Raw.HashFieldExpire(key, ["f"], TimeSpan.FromMinutes(1));
         var when = session.Database.HashFieldGetExpireDateTime(key, ["f"]);
-        Assert.True(when[0] > 0);
+        when[0].ShouldBeGreaterThan(0);
         session.AssertObserved(nameof(IDatabase.HashFieldGetExpireDateTime));
     }
 
@@ -612,13 +609,13 @@ public sealed class HashTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.HashSet(key, "f", "v");
         session.Raw.HashFieldExpire(key, ["f"], TimeSpan.FromMinutes(1));
         var when = await session.Database.HashFieldGetExpireDateTimeAsync(key, ["f"]);
-        Assert.True(when[0] > 0);
+        when[0].ShouldBeGreaterThan(0);
         session.AssertObserved(nameof(IDatabase.HashFieldGetExpireDateTimeAsync));
     }
 
@@ -628,13 +625,13 @@ public sealed class HashTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.HashSet(key, "f", "v");
         session.Raw.HashFieldExpire(key, ["f"], TimeSpan.FromMinutes(1));
         var results = session.Database.HashFieldPersist(key, ["f"]);
-        Assert.Equal(PersistResult.Success, results[0]);
+        results[0].ShouldBe(PersistResult.Success);
         session.AssertObserved(nameof(IDatabase.HashFieldPersist));
     }
 
@@ -644,13 +641,83 @@ public sealed class HashTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.HashSet(key, "f", "v");
         session.Raw.HashFieldExpire(key, ["f"], TimeSpan.FromMinutes(1));
         var results = await session.Database.HashFieldPersistAsync(key, ["f"]);
-        Assert.Equal(PersistResult.Success, results[0]);
+        results[0].ShouldBe(PersistResult.Success);
         session.AssertObserved(nameof(IDatabase.HashFieldPersistAsync));
     }
+
+    [Fact]
+    [RedisMethod(nameof(IDatabase.HashFieldGetAndDelete))]
+    public void Given_redis_When_HashFieldGetAndDelete_Then_state_and_metric_are_observed()
+    {
+        var session = Fixture.CreateSession();
+        var key = NewKey();
+        session.Raw.HashSet(key, "f", "v");
+        session.InvokeAndObserve(nameof(IDatabase.HashFieldGetAndDelete), () => session.Database.HashFieldGetAndDelete(key, "f"));
+    }
+
+    [Fact]
+    [RedisMethod(nameof(IDatabase.HashFieldGetLeaseAndDelete))]
+    public void Given_redis_When_HashFieldGetLeaseAndDelete_Then_state_and_metric_are_observed()
+    {
+        var session = Fixture.CreateSession();
+        var key = NewKey();
+        session.Raw.HashSet(key, "f", "v");
+        session.InvokeAndObserve(nameof(IDatabase.HashFieldGetLeaseAndDelete), () => session.Database.HashFieldGetLeaseAndDelete(key, "f")?.Dispose());
+    }
+
+    [Fact]
+    [RedisMethod(nameof(IDatabase.HashFieldGetAndSetExpiry))]
+    public void Given_redis_When_HashFieldGetAndSetExpiry_Then_state_and_metric_are_observed()
+    {
+        var session = Fixture.CreateSession();
+        var key = NewKey();
+        session.Raw.HashSet(key, "f", "v");
+        session.InvokeAndObserve(
+            nameof(IDatabase.HashFieldGetAndSetExpiry),
+            () => session.Database.HashFieldGetAndSetExpiry(key, "f", TimeSpan.FromMinutes(1)));
+    }
+
+    [Fact]
+    [RedisMethod(nameof(IDatabase.HashFieldGetLeaseAndSetExpiry))]
+    public void Given_redis_When_HashFieldGetLeaseAndSetExpiry_Then_state_and_metric_are_observed()
+    {
+        var session = Fixture.CreateSession();
+        var key = NewKey();
+        session.Raw.HashSet(key, "f", "v");
+        session.InvokeAndObserve(
+            nameof(IDatabase.HashFieldGetLeaseAndSetExpiry),
+            () => session.Database.HashFieldGetLeaseAndSetExpiry(key, "f", TimeSpan.FromMinutes(1))?.Dispose());
+    }
+
+    [Fact]
+    [RedisMethod(nameof(IDatabase.HashFieldSetAndSetExpiry))]
+    public void Given_redis_When_HashFieldSetAndSetExpiry_Then_state_and_metric_are_observed()
+    {
+        var session = Fixture.CreateSession();
+        var key = NewKey();
+        session.InvokeAndObserve(
+            nameof(IDatabase.HashFieldSetAndSetExpiry),
+            () => session.Database.HashFieldSetAndSetExpiry(key, "f", "v", TimeSpan.FromMinutes(1)));
+    }
+
+#pragma warning disable SER008
+    [Fact]
+    [RedisMethod(nameof(IDatabase.HashImport))]
+    public void Given_redis_When_HashImport_Then_state_and_metric_are_observed()
+    {
+        var session = Fixture.CreateSession();
+        var key = NewKey();
+        using var import = HashImport.Create("f");
+        RedisValue[] values = ["v"];
+        session.InvokeAndObserve(
+            nameof(IDatabase.HashImport),
+            () => session.Database.HashImport(key, import, values));
+    }
+#pragma warning restore SER008
 }

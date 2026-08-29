@@ -1,6 +1,3 @@
-using RedisDiagnostic.FunctionalTests.Infrastructure;
-using StackExchange.Redis;
-
 namespace RedisDiagnostic.FunctionalTests.Methods;
 
 [Collection(RedisCollection.Name)]
@@ -16,12 +13,12 @@ public sealed class SetTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         var added = session.Database.SetAdd(key, "a");
-        Assert.True(added);
-        Assert.True(session.Raw.SetContains(key, "a"));
+        added.ShouldBeTrue();
+        session.Raw.SetContains(key, "a").ShouldBeTrue();
         session.AssertObserved(nameof(IDatabase.SetAdd));
     }
 
@@ -31,11 +28,11 @@ public sealed class SetTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         var added = await session.Database.SetAddAsync(key, "a");
-        Assert.True(added);
+        added.ShouldBeTrue();
         session.AssertObserved(nameof(IDatabase.SetAddAsync));
     }
 
@@ -45,12 +42,12 @@ public sealed class SetTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.SetAdd(key, "a");
         var contains = session.Database.SetContains(key, "a");
-        Assert.True(contains);
+        contains.ShouldBeTrue();
         session.AssertObserved(nameof(IDatabase.SetContains));
     }
 
@@ -60,12 +57,12 @@ public sealed class SetTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.SetAdd(key, "a");
         var contains = await session.Database.SetContainsAsync(key, "a");
-        Assert.True(contains);
+        contains.ShouldBeTrue();
         session.AssertObserved(nameof(IDatabase.SetContainsAsync));
     }
 
@@ -75,12 +72,12 @@ public sealed class SetTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.SetAdd(key, "a");
         var removed = session.Database.SetRemove(key, "a");
-        Assert.True(removed);
+        removed.ShouldBeTrue();
         session.AssertObserved(nameof(IDatabase.SetRemove));
     }
 
@@ -90,12 +87,12 @@ public sealed class SetTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.SetAdd(key, "a");
         var removed = await session.Database.SetRemoveAsync(key, "a");
-        Assert.True(removed);
+        removed.ShouldBeTrue();
         session.AssertObserved(nameof(IDatabase.SetRemoveAsync));
     }
 
@@ -105,12 +102,12 @@ public sealed class SetTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.SetAdd(key, "a");
         var length = session.Database.SetLength(key);
-        Assert.Equal(1, length);
+        length.ShouldBe(1);
         session.AssertObserved(nameof(IDatabase.SetLength));
     }
 
@@ -120,12 +117,12 @@ public sealed class SetTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.SetAdd(key, "a");
         var length = await session.Database.SetLengthAsync(key);
-        Assert.Equal(1, length);
+        length.ShouldBe(1);
         session.AssertObserved(nameof(IDatabase.SetLengthAsync));
     }
 
@@ -135,12 +132,12 @@ public sealed class SetTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.SetAdd(key, "a");
         var members = session.Database.SetMembers(key);
-        Assert.Equal("a", (string?)members[0]);
+        ((string?)members[0]).ShouldBe("a");
         session.AssertObserved(nameof(IDatabase.SetMembers));
     }
 
@@ -150,12 +147,12 @@ public sealed class SetTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.SetAdd(key, "a");
         var members = await session.Database.SetMembersAsync(key);
-        Assert.Equal("a", (string?)members[0]);
+        ((string?)members[0]).ShouldBe("a");
         session.AssertObserved(nameof(IDatabase.SetMembersAsync));
     }
 
@@ -165,12 +162,12 @@ public sealed class SetTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.SetAdd(key, "a");
         var value = session.Database.SetPop(key);
-        Assert.Equal("a", (string?)value);
+        ((string?)value).ShouldBe("a");
         session.AssertObserved(nameof(IDatabase.SetPop));
     }
 
@@ -180,12 +177,12 @@ public sealed class SetTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.SetAdd(key, "a");
         var value = await session.Database.SetPopAsync(key);
-        Assert.Equal("a", (string?)value);
+        ((string?)value).ShouldBe("a");
         session.AssertObserved(nameof(IDatabase.SetPopAsync));
     }
 
@@ -195,12 +192,12 @@ public sealed class SetTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.SetAdd(key, "a");
         var value = session.Database.SetRandomMember(key);
-        Assert.Equal("a", (string?)value);
+        ((string?)value).ShouldBe("a");
         session.AssertObserved(nameof(IDatabase.SetRandomMember));
     }
 
@@ -210,12 +207,12 @@ public sealed class SetTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.SetAdd(key, "a");
         var value = await session.Database.SetRandomMemberAsync(key);
-        Assert.Equal("a", (string?)value);
+        ((string?)value).ShouldBe("a");
         session.AssertObserved(nameof(IDatabase.SetRandomMemberAsync));
     }
 
@@ -225,12 +222,12 @@ public sealed class SetTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.SetAdd(key, "a");
         var values = session.Database.SetRandomMembers(key, 1);
-        Assert.Single(values);
+        values.Should().ContainSingle();
         session.AssertObserved(nameof(IDatabase.SetRandomMembers));
     }
 
@@ -240,12 +237,12 @@ public sealed class SetTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.SetAdd(key, "a");
         var values = await session.Database.SetRandomMembersAsync(key, 1);
-        Assert.Single(values);
+        values.Should().ContainSingle();
         session.AssertObserved(nameof(IDatabase.SetRandomMembersAsync));
     }
 
@@ -255,14 +252,14 @@ public sealed class SetTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
-        var dest = Fixture.NewKey("sd");
+        var dest = NewKey("sd");
         session.Raw.SetAdd(key, "a");
         var moved = session.Database.SetMove(key, dest, "a");
-        Assert.True(moved);
-        Assert.True(session.Raw.SetContains(dest, "a"));
+        moved.ShouldBeTrue();
+        session.Raw.SetContains(dest, "a").ShouldBeTrue();
         session.AssertObserved(nameof(IDatabase.SetMove));
     }
 
@@ -272,13 +269,13 @@ public sealed class SetTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
-        var dest = Fixture.NewKey("sd");
+        var dest = NewKey("sd");
         session.Raw.SetAdd(key, "a");
         var moved = await session.Database.SetMoveAsync(key, dest, "a");
-        Assert.True(moved);
+        moved.ShouldBeTrue();
         session.AssertObserved(nameof(IDatabase.SetMoveAsync));
     }
 
@@ -288,14 +285,14 @@ public sealed class SetTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
-        var other = Fixture.NewKey("s2");
+        var other = NewKey("s2");
         session.Raw.SetAdd(key, "a");
         session.Raw.SetAdd(other, "a");
         var values = session.Database.SetCombine(SetOperation.Union, key, other);
-        Assert.Equal("a", (string?)values[0]);
+        ((string?)values[0]).ShouldBe("a");
         session.AssertObserved(nameof(IDatabase.SetCombine));
     }
 
@@ -305,14 +302,14 @@ public sealed class SetTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
-        var other = Fixture.NewKey("s2");
+        var other = NewKey("s2");
         session.Raw.SetAdd(key, "a");
         session.Raw.SetAdd(other, "b");
         var values = await session.Database.SetCombineAsync(SetOperation.Union, key, other);
-        Assert.Equal(2, values.Length);
+        values.Length.ShouldBe(2);
         session.AssertObserved(nameof(IDatabase.SetCombineAsync));
     }
 
@@ -322,15 +319,15 @@ public sealed class SetTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
-        var other = Fixture.NewKey("s2");
-        var dest = Fixture.NewKey("sd");
+        var other = NewKey("s2");
+        var dest = NewKey("sd");
         session.Raw.SetAdd(key, "a");
         session.Raw.SetAdd(other, "b");
         var length = session.Database.SetCombineAndStore(SetOperation.Union, dest, key, other);
-        Assert.Equal(2, length);
+        length.ShouldBe(2);
         session.AssertObserved(nameof(IDatabase.SetCombineAndStore));
     }
 
@@ -340,15 +337,15 @@ public sealed class SetTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
-        var other = Fixture.NewKey("s2");
-        var dest = Fixture.NewKey("sd");
+        var other = NewKey("s2");
+        var dest = NewKey("sd");
         session.Raw.SetAdd(key, "a");
         session.Raw.SetAdd(other, "b");
         var length = await session.Database.SetCombineAndStoreAsync(SetOperation.Union, dest, key, other);
-        Assert.Equal(2, length);
+        length.ShouldBe(2);
         session.AssertObserved(nameof(IDatabase.SetCombineAndStoreAsync));
     }
 
@@ -358,14 +355,14 @@ public sealed class SetTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
-        var other = Fixture.NewKey("s2");
+        var other = NewKey("s2");
         session.Raw.SetAdd(key, "a");
         session.Raw.SetAdd(other, "a");
         var length = session.Database.SetIntersectionLength([key, other]);
-        Assert.Equal(1, length);
+        length.ShouldBe(1);
         session.AssertObserved(nameof(IDatabase.SetIntersectionLength));
     }
 
@@ -375,14 +372,14 @@ public sealed class SetTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
-        var other = Fixture.NewKey("s2");
+        var other = NewKey("s2");
         session.Raw.SetAdd(key, "a");
         session.Raw.SetAdd(other, "a");
         var length = await session.Database.SetIntersectionLengthAsync([key, other]);
-        Assert.Equal(1, length);
+        length.ShouldBe(1);
         session.AssertObserved(nameof(IDatabase.SetIntersectionLengthAsync));
     }
 
@@ -392,12 +389,12 @@ public sealed class SetTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.SetAdd(key, "a");
         var values = session.Database.SetScan(key).ToArray();
-        Assert.Equal("a", (string?)values[0]);
+        ((string?)values[0]).ShouldBe("a");
         session.AssertObserved(nameof(IDatabase.SetScan));
     }
 
@@ -407,16 +404,30 @@ public sealed class SetTests : RedisTestBase
     {
         // Arrange
         var session = Fixture.CreateSession();
-        var key = Fixture.NewKey();
+        var key = NewKey();
 
         // Act / Assert
         session.Raw.SetAdd(key, "a");
-        var values = new List<RedisValue>();
+        List<RedisValue> values = new();
         await foreach (var value in session.Database.SetScanAsync(key))
         {
             values.Add(value);
         }
-        Assert.Equal("a", (string?)values[0]);
+        ((string?)values[0]).ShouldBe("a");
         session.AssertObserved(nameof(IDatabase.SetScanAsync));
+    }
+
+    [Fact]
+    [RedisMethod(nameof(IDatabase.SetCombineLength))]
+    public void Given_redis_When_SetCombineLength_Then_state_and_metric_are_observed()
+    {
+        var session = Fixture.CreateSession();
+        var key = NewKey();
+        var other = NewKey("s2");
+        session.Raw.SetAdd(key, "a");
+        session.Raw.SetAdd(other, "a");
+        session.InvokeAndObserve(
+            nameof(IDatabase.SetCombineLength),
+            () => session.Database.SetCombineLength(SetOperation.Union, [key, other]));
     }
 }

@@ -9,4 +9,6 @@ public abstract class RedisTestBase
     }
 
     protected RedisFixture Fixture { get; }
+
+    protected static string NewKey(string suffix = "k") => RedisFixture.NewKey(suffix);
 }

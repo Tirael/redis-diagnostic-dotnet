@@ -1,2 +1,14 @@
+global using System.Reflection;
+global using Microsoft.CodeAnalysis;
+global using Microsoft.CodeAnalysis.CSharp;
+global using Microsoft.CodeAnalysis.CSharp.Testing;
+global using Microsoft.CodeAnalysis.Testing;
+global using Microsoft.Extensions.DependencyInjection;
+global using Microsoft.Extensions.Time.Testing;
+global using Prometheus;
 global using RedisDiagnostic;
+global using RedisDiagnostic.SourceGenerator;
+global using Shouldly;
+global using AwesomeAssertions;
+global using StackExchange.Redis;
 global using Xunit;
