@@ -17,6 +17,19 @@ public sealed class RedisSession
 
     public CollectorRegistry Registry { get; }
 
+    public void InvokeAndObserve(string methodName, Action action)
+    {
+        try
+        {
+            action();
+            AssertObserved(methodName);
+        }
+        catch (RedisServerException)
+        {
+            AssertObserved(methodName, PrometheusRedisMethodMetrics.ResultError);
+        }
+    }
+
     public void AssertObserved(string methodName, string result = PrometheusRedisMethodMetrics.ResultOk)
     {
         var histogram = Metrics

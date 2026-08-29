@@ -653,4 +653,73 @@ public sealed class HashTests : RedisTestBase
         Assert.Equal(PersistResult.Success, results[0]);
         session.AssertObserved(nameof(IDatabase.HashFieldPersistAsync));
     }
+
+    [Fact]
+    [RedisMethod(nameof(IDatabase.HashFieldGetAndDelete))]
+    public void Given_redis_When_HashFieldGetAndDelete_Then_state_and_metric_are_observed()
+    {
+        var session = Fixture.CreateSession();
+        var key = Fixture.NewKey();
+        session.Raw.HashSet(key, "f", "v");
+        session.InvokeAndObserve(nameof(IDatabase.HashFieldGetAndDelete), () => session.Database.HashFieldGetAndDelete(key, "f"));
+    }
+
+    [Fact]
+    [RedisMethod(nameof(IDatabase.HashFieldGetLeaseAndDelete))]
+    public void Given_redis_When_HashFieldGetLeaseAndDelete_Then_state_and_metric_are_observed()
+    {
+        var session = Fixture.CreateSession();
+        var key = Fixture.NewKey();
+        session.Raw.HashSet(key, "f", "v");
+        session.InvokeAndObserve(nameof(IDatabase.HashFieldGetLeaseAndDelete), () => session.Database.HashFieldGetLeaseAndDelete(key, "f")?.Dispose());
+    }
+
+    [Fact]
+    [RedisMethod(nameof(IDatabase.HashFieldGetAndSetExpiry))]
+    public void Given_redis_When_HashFieldGetAndSetExpiry_Then_state_and_metric_are_observed()
+    {
+        var session = Fixture.CreateSession();
+        var key = Fixture.NewKey();
+        session.Raw.HashSet(key, "f", "v");
+        session.InvokeAndObserve(
+            nameof(IDatabase.HashFieldGetAndSetExpiry),
+            () => session.Database.HashFieldGetAndSetExpiry(key, "f", TimeSpan.FromMinutes(1)));
+    }
+
+    [Fact]
+    [RedisMethod(nameof(IDatabase.HashFieldGetLeaseAndSetExpiry))]
+    public void Given_redis_When_HashFieldGetLeaseAndSetExpiry_Then_state_and_metric_are_observed()
+    {
+        var session = Fixture.CreateSession();
+        var key = Fixture.NewKey();
+        session.Raw.HashSet(key, "f", "v");
+        session.InvokeAndObserve(
+            nameof(IDatabase.HashFieldGetLeaseAndSetExpiry),
+            () => session.Database.HashFieldGetLeaseAndSetExpiry(key, "f", TimeSpan.FromMinutes(1))?.Dispose());
+    }
+
+    [Fact]
+    [RedisMethod(nameof(IDatabase.HashFieldSetAndSetExpiry))]
+    public void Given_redis_When_HashFieldSetAndSetExpiry_Then_state_and_metric_are_observed()
+    {
+        var session = Fixture.CreateSession();
+        var key = Fixture.NewKey();
+        session.InvokeAndObserve(
+            nameof(IDatabase.HashFieldSetAndSetExpiry),
+            () => session.Database.HashFieldSetAndSetExpiry(key, "f", "v", TimeSpan.FromMinutes(1)));
+    }
+
+#pragma warning disable SER008
+    [Fact]
+    [RedisMethod(nameof(IDatabase.HashImport))]
+    public void Given_redis_When_HashImport_Then_state_and_metric_are_observed()
+    {
+        var session = Fixture.CreateSession();
+        var key = Fixture.NewKey();
+        using var import = HashImport.Create(["f"]);
+        session.InvokeAndObserve(
+            nameof(IDatabase.HashImport),
+            () => session.Database.HashImport(key, import, new RedisValue[] { "v" }));
+    }
+#pragma warning restore SER008
 }

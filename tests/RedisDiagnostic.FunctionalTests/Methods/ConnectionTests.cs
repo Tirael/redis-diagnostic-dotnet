@@ -1,6 +1,8 @@
 using RedisDiagnostic.FunctionalTests.Infrastructure;
 using StackExchange.Redis;
 
+#pragma warning disable SER308 // These tests intentionally exercise the blocking Wait APIs.
+
 namespace RedisDiagnostic.FunctionalTests.Methods;
 
 [Collection(RedisCollection.Name)]

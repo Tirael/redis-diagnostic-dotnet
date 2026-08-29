@@ -597,6 +597,26 @@ public sealed class StringTests : RedisTestBase
     }
 
     [Fact]
+    [RedisMethod(nameof(IDatabase.StringDelete))]
+    public void Given_redis_When_StringDelete_Then_state_and_metric_are_observed()
+    {
+        var session = Fixture.CreateSession();
+        var key = Fixture.NewKey();
+        session.Raw.StringSet(key, "v");
+        session.InvokeAndObserve(nameof(IDatabase.StringDelete), () => session.Database.StringDelete(key, ValueCondition.Exists));
+    }
+
+    [Fact]
+    [RedisMethod(nameof(IDatabase.StringDigest))]
+    public void Given_redis_When_StringDigest_Then_state_and_metric_are_observed()
+    {
+        var session = Fixture.CreateSession();
+        var key = Fixture.NewKey();
+        session.Raw.StringSet(key, "v");
+        session.InvokeAndObserve(nameof(IDatabase.StringDigest), () => session.Database.StringDigest(key));
+    }
+
+    [Fact]
     [RedisMethod(nameof(IDatabase.StringLongestCommonSubsequence))]
     public void Given_redis_When_StringLongestCommonSubsequence_Then_state_and_metric_are_observed()
     {

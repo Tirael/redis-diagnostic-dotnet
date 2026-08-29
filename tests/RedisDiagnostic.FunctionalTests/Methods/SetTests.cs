@@ -419,4 +419,18 @@ public sealed class SetTests : RedisTestBase
         Assert.Equal("a", (string?)values[0]);
         session.AssertObserved(nameof(IDatabase.SetScanAsync));
     }
+
+    [Fact]
+    [RedisMethod(nameof(IDatabase.SetCombineLength))]
+    public void Given_redis_When_SetCombineLength_Then_state_and_metric_are_observed()
+    {
+        var session = Fixture.CreateSession();
+        var key = Fixture.NewKey();
+        var other = Fixture.NewKey("s2");
+        session.Raw.SetAdd(key, "a");
+        session.Raw.SetAdd(other, "a");
+        session.InvokeAndObserve(
+            nameof(IDatabase.SetCombineLength),
+            () => session.Database.SetCombineLength(SetOperation.Union, [key, other]));
+    }
 }
